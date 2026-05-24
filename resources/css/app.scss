@@ -1,0 +1,24 @@
+// Override Bootstrap variables
+$primary:               #1a1a2e;
+$secondary:             #4a4a6a;
+$font-family-sans-serif: 'Inter', sans-serif;
+$border-radius:          0.75rem;
+$border-radius-lg:       1rem;
+$border-radius-xl:       1.25rem;
+$card-border-width:      0;
+$card-box-shadow:        0 2px 16px rgba(0,0,0,.08);
+
+// Import Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// Global base styles
+body {
+    font-family: $font-family-sans-serif;
+    background-color: #f8f9fa;
+    color: #1a1a2e;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
