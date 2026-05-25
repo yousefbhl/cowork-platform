@@ -284,16 +284,16 @@ Never use Bootstrap CDN. Always compile from Sass source.
 ## Build phases completed
 
 - [x] Phase 0 — Project setup (Laravel + Vue 3 + Bootstrap 5 Sass + Sanctum + Git)
-- [ ] Phase 1 — Full database schema + all migrations + factories + seeders
-- [ ] Phase 2 — Auth end-to-end (Sanctum ↔ Pinia store ↔ Vue route guards)
-- [ ] Phase 3 — API skeleton (all routes + controllers returning mock JSON + Postman tested)
+- [x] Phase 1 — Full database schema + all migrations + factories + seeders
+- [x] Phase 2 — Auth end-to-end (Sanctum ↔ Pinia store ↔ Vue route guards)
+- [x] Phase 3 — API skeleton (all routes + controllers + resources + policies + Postman tested)
 - [ ] Phase 4 — Feature slices (Listings → Search → Booking → Dashboards)
 
 ---
 
 ## Current phase
 
-**Phase 0 complete. Starting Phase 1 — database schema.**
+**Phase 3 complete. Starting Phase 4 — Feature slices (Listings → Search → Booking → Dashboards).**
 
 ---
 
