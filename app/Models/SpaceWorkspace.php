@@ -47,7 +47,7 @@ class SpaceWorkspace extends Model
         return $this->bookingDays()
             ->whereBetween('day', [$from, $to])
             ->pluck('day')
-            ->map(fn($d) => (string) $d)
+            ->map(fn($d) => substr((string) $d, 0, 10))
             ->toArray();
     }
 }

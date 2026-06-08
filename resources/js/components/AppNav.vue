@@ -51,6 +51,12 @@ async function logout() {
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
+                                <RouterLink to="/bookings" class="dropdown-item">
+                                    My bookings
+                                </RouterLink>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
                                 <button class="dropdown-item text-danger" @click="logout">
                                     Sign out
                                 </button>

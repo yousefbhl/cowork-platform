@@ -1,11 +1,63 @@
 <script setup>
-import { onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { onMounted, ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useSpacesStore } from '@/stores/spaces'
+import { useBookingStore } from '@/stores/booking'
+import { useAuthStore } from '@/stores/auth'
 import AppNav from '@/components/AppNav.vue'
+import CalendarPicker from '@/components/CalendarPicker.vue'
 
-const route = useRoute()
-const store = useSpacesStore()
+const route        = useRoute()
+const router       = useRouter()
+const store        = useSpacesStore()
+const bookingStore = useBookingStore()
+const auth         = useAuthStore()
+
+const selectedWorkspace = ref(null)
+const range             = ref({ start_date: null, end_date: null })
+const bookingError      = ref(null)
+
+const nights = computed(() => {
+    if (!range.value.start_date || !range.value.end_date) return 0
+    const start = new Date(range.value.start_date)
+    const end   = new Date(range.value.end_date)
+    return Math.round((end - start) / (1000 * 60 * 60 * 24))
+})
+
+const estimatedTotal = computed(() => {
+    if (!selectedWorkspace.value?.price_daily || !nights.value) return '0.00'
+    return (selectedWorkspace.value.price_daily * nights.value).toFixed(2)
+})
+
+const canBook = computed(() =>
+    selectedWorkspace.value && range.value.start_date && range.value.end_date
+)
+
+function selectWorkspace(workspace) {
+    selectedWorkspace.value = workspace
+    range.value = { start_date: null, end_date: null }
+    bookingError.value = null
+}
+
+function onRangeSelected(r) {
+    range.value = r
+    bookingError.value = null
+}
+
+async function submitBooking() {
+    bookingError.value = null
+    const result = await bookingStore.createBooking({
+        space_workspace_id: selectedWorkspace.value.id,
+        start_date: range.value.start_date,
+        end_date:   range.value.end_date,
+    })
+
+    if (result.success) {
+        router.push('/bookings')
+    } else {
+        bookingError.value = result.message
+    }
+}
 
 onMounted(() => store.fetchSpace(route.params.slug))
 </script>
@@ -60,7 +112,6 @@ onMounted(() => store.fetchSpace(route.params.slug))
 
                 <!-- Left: info -->
                 <div class="col-12 col-lg-7">
-
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <h1 class="h3 fw-bold mb-0">{{ store.space.title }}</h1>
                         <div v-if="store.space.rating_avg" class="d-flex align-items-center gap-1 flex-shrink-0">
@@ -125,41 +176,78 @@ onMounted(() => store.fetchSpace(route.params.slug))
                         class="card border-0 shadow p-4 sticky-top"
                         style="top: 80px; border-radius: 1.25rem;"
                     >
-                        <h5 class="fw-bold mb-4">Choose a workspace</h5>
+                        <h5 class="fw-bold mb-4">Book this space</h5>
 
+                        <!-- Workspace selection -->
+                        <label class="form-label small fw-semibold mb-2">Workspace type</label>
                         <div
                             v-for="workspace in store.space.workspaces"
                             :key="workspace.id"
-                            class="border rounded-3 p-3 mb-3"
+                            class="border rounded-3 p-3 mb-2"
+                            :class="{ 'border-dark border-2': selectedWorkspace?.id === workspace.id }"
+                            style="cursor: pointer; transition: border-color .15s;"
+                            @click="selectWorkspace(workspace)"
                         >
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <p class="fw-semibold mb-0">{{ workspace.type?.label }}</p>
-                                    <p class="text-muted mb-0" style="font-size: 13px;">
+                                    <p class="fw-semibold mb-0" style="font-size: 14px;">{{ workspace.type?.label }}</p>
+                                    <p class="text-muted mb-0" style="font-size: 12px;">
                                         Up to {{ workspace.capacity }} person{{ workspace.capacity > 1 ? 's' : '' }}
                                     </p>
                                 </div>
-                                <div class="text-end">
-                                    <p v-if="workspace.price_daily" class="fw-bold mb-0">
-                                        ${{ workspace.price_daily }}
-                                        <span class="fw-normal text-muted" style="font-size: 12px;">/day</span>
-                                    </p>
-                                    <p v-if="workspace.price_monthly" class="text-muted mb-0" style="font-size: 12px;">
-                                        ${{ workspace.price_monthly }}/mo
-                                    </p>
-                                </div>
+                                <p v-if="workspace.price_daily" class="fw-bold mb-0" style="font-size: 14px;">
+                                    ${{ workspace.price_daily }}
+                                    <span class="fw-normal text-muted" style="font-size: 11px;">/day</span>
+                                </p>
                             </div>
                         </div>
 
+                        <!-- Calendar -->
+                        <div v-if="selectedWorkspace" class="mt-4">
+                            <label class="form-label small fw-semibold mb-2">Select dates</label>
+                            <CalendarPicker
+                                :workspace-id="selectedWorkspace.id"
+                                @range-selected="onRangeSelected"
+                            />
+                        </div>
+
+                        <!-- Price summary -->
+                        <div v-if="range.start_date && range.end_date" class="mt-4 pt-3 border-top">
+                            <div class="d-flex justify-content-between mb-1" style="font-size: 14px;">
+                                <span class="text-muted">
+                                    {{ nights }} day{{ nights > 1 ? 's' : '' }} × ${{ selectedWorkspace.price_daily }}
+                                </span>
+                                <span>${{ estimatedTotal }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between fw-bold mt-1">
+                                <span>Total</span>
+                                <span>${{ estimatedTotal }}</span>
+                            </div>
+                        </div>
+
+                        <!-- CTA -->
+                        <button
+                            v-if="auth.isAuthenticated"
+                            class="btn btn-primary w-100 mt-3"
+                            style="border-radius: .75rem; padding: .75rem;"
+                            :disabled="!canBook || bookingStore.submitting"
+                            @click="submitBooking"
+                        >
+                            {{ bookingStore.submitting ? 'Reserving…' : 'Reserve' }}
+                        </button>
                         <RouterLink
+                            v-else
                             to="/login"
-                            class="btn btn-primary w-100 mt-2"
+                            class="btn btn-primary w-100 mt-3"
                             style="border-radius: .75rem; padding: .75rem;"
                         >
-                            Reserve this space
+                            Sign in to book
                         </RouterLink>
 
-                        <p class="text-center text-muted mt-2 mb-0" style="font-size: 12px;">
+                        <p v-if="bookingError" class="text-danger mt-2 mb-0" style="font-size: 13px;">
+                            {{ bookingError }}
+                        </p>
+                        <p v-else class="text-center text-muted mt-2 mb-0" style="font-size: 12px;">
                             Free cancellation · Instant confirmation
                         </p>
                     </div>

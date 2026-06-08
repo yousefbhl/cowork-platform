@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
+use App\Services\BookingService;
 use Illuminate\Http\Request;
 
 class BookingController extends Controller
@@ -13,19 +14,22 @@ class BookingController extends Controller
     {
         $bookings = $request->user()
             ->bookings()
-            ->with(['workspace.workspaceType', 'workspace.space', 'review'])
+            ->with(['workspace.workspaceType', 'workspace.space.photos', 'review'])
             ->latest()
             ->paginate(20);
 
         return BookingResource::collection($bookings);
     }
 
-    public function store(StoreBookingRequest $request)
+    public function store(StoreBookingRequest $request, BookingService $service)
     {
-        // Double-booking engine implemented in Phase 4
-        return response()->json([
-            'message' => 'Booking engine not yet implemented',
-        ], 501);
+        $booking = $service->create($request->user()->id, $request->validated());
+
+        $booking->load(['workspace.workspaceType', 'workspace.space']);
+
+        return (new BookingResource($booking))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function show(Request $request, Booking $booking)
@@ -41,6 +45,7 @@ class BookingController extends Controller
     {
         $this->authorize('cancel', $booking);
 
+        $booking->days()->delete();
         $booking->update(['status' => 'cancelled']);
 
         return new BookingResource($booking);

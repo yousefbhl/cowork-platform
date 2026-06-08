@@ -31,6 +31,14 @@ const routes = [
         meta: { guestOnly: true },
     },
 
+    // ── Customer (auth) ─────────────────────────────────
+    {
+        path: '/bookings',
+        name: 'bookings',
+        component: () => import('@/views/customer/BookingsView.vue'),
+        meta: { requiresAuth: true },
+    },
+
     // ── Host ────────────────────────────────────────────
     {
         path: '/host',
