@@ -287,13 +287,16 @@ Never use Bootstrap CDN. Always compile from Sass source.
 - [x] Phase 1 — Full database schema + all migrations + factories + seeders
 - [x] Phase 2 — Auth end-to-end (Sanctum ↔ Pinia store ↔ Vue route guards)
 - [x] Phase 3 — API skeleton (all routes + controllers + resources + policies + Postman tested)
-- [ ] Phase 4 — Feature slices (Listings → Search → Booking → Dashboards)
+- [x] Phase 4 Slice 1 — Listings (FilterPipeline, SpaceCard, SearchView, SpaceDetailView, AppNav, spaces store)
+- [ ] Phase 4 Slice 2 — Booking (availability calendar + double-booking guard + Stripe)
+- [ ] Phase 4 Slice 3 — Host dashboard (space CRUD + calendar + stats)
+- [ ] Phase 4 Slice 4 — Admin panel (approvals + user management)
 
 ---
 
 ## Current phase
 
-**Phase 3 complete. Starting Phase 4 — Feature slices (Listings → Search → Booking → Dashboards).**
+**Phase 4 Slice 1 complete. Next: Phase 4 Slice 2 — Booking (availability calendar + double-booking guard + Stripe).**
 
 ---
 
