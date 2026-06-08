@@ -16,6 +16,11 @@ class Space extends Model
         'status', 'rating_avg', 'reviews_count',
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     protected static function booted(): void
     {
         static::creating(function (Space $space) {

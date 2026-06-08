@@ -22,9 +22,13 @@ export const useSpacesStore = defineStore('spaces', () => {
 
     async function fetchSpace(slug) {
         loading.value = true
+        space.value = null
         try {
             const { data } = await api.get(`/spaces/${slug}`)
             space.value = data.data
+        } catch (e) {
+            console.error('Failed to load space:', e.response?.status, slug)
+            space.value = null
         } finally {
             loading.value = false
         }

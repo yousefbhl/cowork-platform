@@ -256,4 +256,10 @@ onMounted(() => store.fetchSpace(route.params.slug))
             </div>
         </div>
     </template>
+
+    <div v-else class="container py-5 text-center text-muted">
+        <div class="mb-3" style="font-size: 3rem;">🔍</div>
+        <p class="fw-medium">Space not found</p>
+        <RouterLink to="/spaces" class="btn btn-primary btn-sm">Back to search</RouterLink>
+    </div>
 </template>
