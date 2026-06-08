@@ -288,7 +288,7 @@ Never use Bootstrap CDN. Always compile from Sass source.
 - [x] Phase 2 — Auth end-to-end (Sanctum ↔ Pinia store ↔ Vue route guards)
 - [x] Phase 3 — API skeleton (all routes + controllers + resources + policies + Postman tested)
 - [x] Phase 4 Slice 1 — Listings (FilterPipeline, SpaceCard, SearchView, SpaceDetailView, AppNav, spaces store)
-- [ ] Phase 4 Slice 2 — Booking (availability calendar + double-booking guard + Stripe)
+- [x] Phase 4 Slice 2 — Booking engine (BookingService + CalendarPicker + checkout + my bookings)
 - [ ] Phase 4 Slice 3 — Host dashboard (space CRUD + calendar + stats)
 - [ ] Phase 4 Slice 4 — Admin panel (approvals + user management)
 
@@ -296,7 +296,7 @@ Never use Bootstrap CDN. Always compile from Sass source.
 
 ## Current phase
 
-**Phase 4 Slice 1 complete. Next: Phase 4 Slice 2 — Booking (availability calendar + double-booking guard + Stripe).**
+**Phase 4 Slice 2 complete. Next: Phase 4 Slice 3 — Host dashboard (space CRUD + calendar + stats).**
 
 ---
 
@@ -311,6 +311,8 @@ Never use Bootstrap CDN. Always compile from Sass source.
 | booking_days UNIQUE index | Atomic double-booking guard at DB level, no race conditions |
 | Single Axios instance | One place for interceptors, token attachment, 401 redirect |
 | Scout database driver first | Zero infrastructure, enough for early scale, swap to Meilisearch later |
+| BookingService in transaction | lockForUpdate + booking_days insert atomic; duplicate key = 422, never double-book |
+| Checkout day excluded | Like hotels — end_date is checkout, not a booked night |
 
 ---
 
