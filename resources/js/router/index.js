@@ -9,6 +9,16 @@ const routes = [
         component: () => import('@/views/customer/HomeView.vue'),
     },
     {
+        path: '/spaces',
+        name: 'spaces',
+        component: () => import('@/views/customer/SearchView.vue'),
+    },
+    {
+        path: '/spaces/:slug',
+        name: 'spaces.show',
+        component: () => import('@/views/customer/SpaceDetailView.vue'),
+    },
+    {
         path: '/login',
         name: 'login',
         component: () => import('@/views/customer/LoginView.vue'),
@@ -52,26 +62,22 @@ const router = createRouter({
 router.beforeEach(async (to) => {
     const auth = useAuthStore()
 
-    // Rehydrate user on first load if token exists in localStorage
     if (!auth.user && auth.token) {
         await auth.fetchUser()
     }
 
-    // Redirect already-logged-in users away from /login and /register
     if (to.meta.guestOnly && auth.isAuthenticated) {
         if (auth.isAdmin) return { name: 'admin.dashboard' }
         if (auth.isHost)  return { name: 'host.dashboard' }
-        return { name: 'home' }
+        return { name: 'spaces' }
     }
 
-    // Protect auth-required routes
     if (to.meta.requiresAuth) {
         if (!auth.isAuthenticated) {
             return { name: 'login', query: { redirect: to.fullPath } }
         }
-
         if (to.meta.role && auth.user?.role !== to.meta.role) {
-            return { name: 'home' }
+            return { name: 'spaces' }
         }
     }
 })
