@@ -1,83 +1,116 @@
 <script setup>
-import { onMounted } from 'vue'
-import { useSpacesStore } from '@/stores/spaces'
+import { onMounted, ref } from 'vue'
+import { useSpaceStore } from '@/stores/spaces'
+import CustomerLayout from '@/components/layouts/CustomerLayout.vue'
 import SpaceCard from '@/components/SpaceCard.vue'
-import FilterBar from '@/components/FilterBar.vue'
-import AppNav from '@/components/AppNav.vue'
+import Button from '@/components/ui/Button.vue'
 
-const store = useSpacesStore()
+const spaceStore = useSpaceStore()
+const showFilters = ref(true)
+const priceRange = ref({ min: 0, max: 500 })
+const selectedAmenities = ref([])
 
-onMounted(() => store.fetchSpaces())
+onMounted(() => spaceStore.fetchSpaces())
 
-function onFilter(params) {
-    store.fetchSpaces(params)
+function onFilter() {
+    // Apply filter logic
+    spaceStore.fetchSpaces({
+        price_min: priceRange.value.min,
+        price_max: priceRange.value.max,
+    })
 }
 </script>
 
 <template>
-    <AppNav />
-    <FilterBar @filter="onFilter" />
+    <CustomerLayout>
+        <div class="bg-bg-primary min-h-screen flex">
+            <!-- Sidebar Filters -->
+            <aside v-show="showFilters" class="w-64 bg-bg-secondary border-r border-border-light p-lg">
+                <div class="mb-2xl">
+                    <h3 class="text-heading-sm font-600 text-text-primary mb-lg">Filters</h3>
 
-    <div class="container py-5">
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="h4 fw-bold mb-0">Workspaces</h1>
-                <p class="text-muted mb-0" style="font-size: 14px;">
-                    {{ store.meta.total ?? store.spaces.length }} spaces found
-                </p>
-            </div>
-        </div>
-
-        <!-- Loading skeleton -->
-        <div v-if="store.loading" class="row g-3">
-            <div v-for="n in 8" :key="n" class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                <div class="card h-100" style="border-radius: 1rem; overflow: hidden;">
-                    <div class="placeholder-glow" style="aspect-ratio: 16/10; background: #f1f0ea;">
-                        <span class="placeholder w-100 h-100 d-block"></span>
+                    <!-- Price Range -->
+                    <div class="mb-xl pb-xl border-b border-border-light">
+                        <label class="text-label-md text-text-primary mb-md block">Price Range</label>
+                        <div class="flex gap-md">
+                            <input
+                                v-model="priceRange.min"
+                                type="number"
+                                placeholder="Min"
+                                class="input-base flex-1 py-md px-md"
+                            />
+                            <input
+                                v-model="priceRange.max"
+                                type="number"
+                                placeholder="Max"
+                                class="input-base flex-1 py-md px-md"
+                            />
+                        </div>
                     </div>
-                    <div class="card-body placeholder-glow">
-                        <span class="placeholder col-8 mb-2 d-block"></span>
-                        <span class="placeholder col-5"></span>
+
+                    <!-- Amenities -->
+                    <div class="mb-xl pb-xl border-b border-border-light">
+                        <label class="text-label-md text-text-primary mb-md block">Amenities</label>
+                        <div class="space-y-md">
+                            <label v-for="amenity in ['WiFi', 'Coffee', 'Parking', 'Meeting Rooms', 'Kitchen']" :key="amenity" class="flex items-center gap-md cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 rounded" />
+                                <span class="text-body-sm text-text-secondary">{{ amenity }}</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Availability -->
+                    <div>
+                        <label class="text-label-md text-text-primary mb-md block">Availability</label>
+                        <div class="space-y-md">
+                            <label v-for="option in ['Available Now', 'Available This Week', 'Available This Month']" :key="option" class="flex items-center gap-md cursor-pointer">
+                                <input type="radio" name="availability" class="w-4 h-4" />
+                                <span class="text-body-sm text-text-secondary">{{ option }}</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Grid -->
-        <div v-else-if="store.spaces.length" class="row g-3 g-lg-4">
-            <div
-                v-for="space in store.spaces"
-                :key="space.id"
-                class="col-12 col-sm-6 col-lg-4 col-xl-3"
-            >
-                <SpaceCard :space="space" />
-            </div>
-        </div>
+                <Button variant="primary" fullWidth @click="onFilter">Apply Filters</Button>
+            </aside>
 
-        <!-- Empty state -->
-        <div v-else class="text-center py-5 text-muted">
-            <div class="mb-3" style="font-size: 3rem;">🏢</div>
-            <p class="fw-medium">No spaces match your search</p>
-            <p style="font-size: 14px;">Try adjusting your filters</p>
-        </div>
-
-        <!-- Pagination -->
-        <div v-if="store.meta.last_page > 1" class="d-flex justify-content-center mt-5">
-            <nav>
-                <ul class="pagination">
-                    <li
-                        v-for="page in store.meta.last_page"
-                        :key="page"
-                        class="page-item"
-                        :class="{ active: page === store.meta.current_page }"
-                    >
-                        <button class="page-link" @click="store.fetchSpaces({ page })">
-                            {{ page }}
+            <!-- Main Content -->
+            <main class="flex-1">
+                <!-- Header -->
+                <div class="bg-bg-secondary border-b border-border-light p-xl sticky top-16 z-10">
+                    <div class="page-container flex-between">
+                        <div>
+                            <h1 class="text-heading-lg font-600 text-text-primary">Available Spaces</h1>
+                            <p class="text-body-sm text-text-secondary mt-xs">
+                                {{ spaceStore.spaces.length }} workspace{{ spaceStore.spaces.length !== 1 ? 's' : '' }} available
+                            </p>
+                        </div>
+                        <button
+                            @click="showFilters = !showFilters"
+                            class="md:hidden px-lg py-md bg-bg-tertiary border border-border-light rounded-md text-body-sm text-text-primary hover:bg-border-light transition-colors"
+                        >
+                            {{ showFilters ? 'Hide' : 'Show' }} Filters
                         </button>
-                    </li>
-                </ul>
-            </nav>
+                    </div>
+                </div>
+
+                <!-- Results Grid -->
+                <div class="p-xl">
+                    <div v-if="spaceStore.loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-xl">
+                        <div v-for="i in 6" :key="i" class="card-base h-96 animate-pulse"></div>
+                    </div>
+
+                    <div v-else-if="spaceStore.spaces.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-xl">
+                        <SpaceCard v-for="space in spaceStore.spaces" :key="space.id" :space="space" />
+                    </div>
+
+                    <div v-else class="text-center py-4xl">
+                        <div class="text-6xl mb-lg">🏢</div>
+                        <h2 class="text-heading-md text-text-primary mb-md">No spaces found</h2>
+                        <p class="text-body-md text-text-secondary">Try adjusting your filters or search criteria</p>
+                    </div>
+                </div>
+            </main>
         </div>
-    </div>
+    </CustomerLayout>
 </template>
