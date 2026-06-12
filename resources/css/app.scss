@@ -1,26 +1,242 @@
-// Override Bootstrap variables
-$enable-negative-margins: true;
-$spacer:                1rem;
-$primary:               #1a1a2e;
-$secondary:             #4a4a6a;
-$font-family-sans-serif: 'Inter', sans-serif;
-$border-radius:          0.75rem;
-$border-radius-lg:       1rem;
-$border-radius-xl:       1.25rem;
-$card-border-width:      0;
-$card-box-shadow:        0 2px 16px rgba(0,0,0,.08);
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
-// Import Bootstrap
-@import 'bootstrap/scss/bootstrap';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
 
-// Global base styles
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&display=swap');
+
+/* Base styles */
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: #0F0F10;
+}
+
 body {
-    font-family: $font-family-sans-serif;
-    background-color: #f8f9fa;
-    color: #1a1a2e;
+  @apply font-inter text-body-md text-text-primary bg-bg-primary;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
-    text-decoration: none;
-    color: inherit;
+  @apply no-underline;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0F0F10;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333338;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2A2A2F;
+}
+
+/* Component base styles */
+@layer components {
+  /* Button base styles */
+  .btn-base {
+    @apply inline-flex items-center justify-center font-inter font-500 transition-all duration-200 cursor-pointer;
+  }
+
+  .btn-primary {
+    @apply btn-base px-lg py-md bg-accent-violet text-white rounded-md hover:bg-opacity-90 active:bg-opacity-100;
+  }
+
+  .btn-secondary {
+    @apply btn-base px-lg py-md bg-border-light text-text-primary rounded-md hover:bg-border-medium active:bg-border-medium;
+  }
+
+  .btn-ghost {
+    @apply btn-base px-lg py-md text-text-primary rounded-md hover:bg-bg-secondary active:bg-bg-tertiary;
+  }
+
+  /* Card base styles */
+  .card-base {
+    @apply bg-bg-secondary rounded-lg border border-border-light transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply card-base hover:border-border-medium hover:shadow-md;
+  }
+
+  /* Badge base styles */
+  .badge-base {
+    @apply inline-flex items-center px-md py-xs rounded-md text-label-md font-600;
+  }
+
+  .badge-success {
+    @apply badge-base bg-accent-green bg-opacity-20 text-accent-green;
+  }
+
+  .badge-warning {
+    @apply badge-base bg-accent-amber bg-opacity-20 text-accent-amber;
+  }
+
+  .badge-error {
+    @apply badge-base bg-accent-red bg-opacity-20 text-accent-red;
+  }
+
+  .badge-info {
+    @apply badge-base bg-accent-blue bg-opacity-20 text-accent-blue;
+  }
+
+  .badge-default {
+    @apply badge-base bg-border-light text-text-secondary;
+  }
+
+  /* Input base styles */
+  .input-base {
+    @apply w-full px-lg py-md bg-bg-secondary border border-border-light rounded-md text-body-md text-text-primary placeholder-text-tertiary transition-colors duration-200;
+  }
+
+  .input-base:focus {
+    @apply outline-none border-accent-violet ring-1 ring-accent-violet ring-opacity-30;
+  }
+
+  /* Divider */
+  .divider {
+    @apply border-t border-border-light;
+  }
+
+  /* Page container */
+  .page-container {
+    @apply max-w-7xl mx-auto px-lg py-xl;
+  }
+
+  /* Grid layout */
+  .grid-12 {
+    @apply grid grid-cols-12 gap-xl;
+  }
+}
+
+/* Utility animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+
+  .flex-col-center {
+    @apply flex flex-col items-center justify-center;
+  }
+
+  /* Truncation */
+  .truncate-line {
+    @apply truncate;
+  }
+
+  .truncate-lines-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .truncate-lines-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Responsive utilities */
+  .responsive-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-lg;
+  }
+
+  .responsive-grid-2 {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-lg;
+  }
+
+  /* Mobile-first spacing */
+  .container-responsive {
+    @apply w-full px-lg md:px-xl;
+  }
+
+  /* Visibility helpers */
+  .hidden-mobile {
+    @apply hidden md:block;
+  }
+
+  .visible-mobile {
+    @apply md:hidden;
+  }
+}
+
+  .animate-slide-in-up {
+    animation: slideInUp 0.3s ease-in-out;
+  }
+
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Utility classes for common patterns */
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+
+  .flex-col-center {
+    @apply flex flex-col items-center justify-center;
+  }
+
+  /* Truncation */
+  .truncate-line {
+    @apply truncate;
+  }
+
+  .truncate-lines-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .truncate-lines-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }

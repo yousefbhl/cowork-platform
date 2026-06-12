@@ -1,17 +1,21 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useSpacesStore } from '@/stores/spaces'
+import { useSpaceStore } from '@/stores/spaces'
 import { useBookingStore } from '@/stores/booking'
 import { useAuthStore } from '@/stores/auth'
-import AppNav from '@/components/AppNav.vue'
+import CustomerLayout from '@/components/layouts/CustomerLayout.vue'
 import CalendarPicker from '@/components/CalendarPicker.vue'
+import Button from '@/components/ui/Button.vue'
+import PriceTag from '@/components/ui/PriceTag.vue'
+import StatusBadge from '@/components/ui/StatusBadge.vue'
+import Card from '@/components/ui/Card.vue'
 
-const route        = useRoute()
-const router       = useRouter()
-const store        = useSpacesStore()
+const route = useRoute()
+const router = useRouter()
+const spaceStore = useSpaceStore()
 const bookingStore = useBookingStore()
-const auth         = useAuthStore()
+const auth = useAuthStore()
 
 const selectedWorkspace = ref(null)
 const range             = ref({ start_date: null, end_date: null })
@@ -59,207 +63,190 @@ async function submitBooking() {
     }
 }
 
-onMounted(() => store.fetchSpace(route.params.slug))
+onMounted(() => spaceStore.fetchSpace(route.params.slug))
 </script>
 
 <template>
-    <AppNav />
-
-    <div v-if="store.loading" class="container py-5 text-center text-muted">
-        <div class="spinner-border spinner-border-sm me-2"></div>
-        Loading space…
-    </div>
-
-    <template v-else-if="store.space">
-
-        <!-- Hero photo gallery -->
-        <div class="container py-3">
-            <div
-                v-if="store.space.photos?.length"
-                class="row g-2"
-                style="max-height: 480px; overflow: hidden; border-radius: 1.25rem;"
-            >
-                <div class="col-8">
-                    <img
-                        :src="`/storage/${store.space.photos[0].path}`"
-                        class="w-100 h-100 object-fit-cover"
-                        style="border-radius: 1rem 0 0 1rem;"
-                        :alt="store.space.title"
-                    />
-                </div>
-                <div class="col-4 d-flex flex-column gap-2">
-                    <img
-                        v-for="photo in store.space.photos.slice(1, 3)"
-                        :key="photo.id"
-                        :src="`/storage/${photo.path}`"
-                        class="w-100 object-fit-cover flex-grow-1"
-                        :alt="store.space.title"
-                    />
-                </div>
-            </div>
-            <div
-                v-else
-                class="bg-light d-flex align-items-center justify-content-center"
-                style="height: 360px; border-radius: 1.25rem;"
-            >
-                <span style="font-size: 4rem; opacity: .2;">🏢</span>
+    <CustomerLayout>
+        <div v-if="spaceStore.loading" class="flex-col-center py-4xl">
+            <div class="animate-spin">
+                <svg class="w-8 h-8 text-accent-violet" fill="none" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" opacity="0.25"></circle>
+                    <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+                </svg>
             </div>
         </div>
 
-        <!-- Content -->
-        <div class="container py-4">
-            <div class="row g-5">
+        <template v-else-if="spaceStore.space">
 
-                <!-- Left: info -->
-                <div class="col-12 col-lg-7">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h1 class="h3 fw-bold mb-0">{{ store.space.title }}</h1>
-                        <div v-if="store.space.rating_avg" class="d-flex align-items-center gap-1 flex-shrink-0">
-                            <span>⭐</span>
-                            <span class="fw-semibold">{{ Number(store.space.rating_avg).toFixed(1) }}</span>
-                            <span class="text-muted" style="font-size: 13px;">({{ store.space.reviews_count }})</span>
-                        </div>
-                    </div>
-
-                    <p class="text-muted mb-4">
-                        {{ store.space.city }}<span v-if="store.space.country">, {{ store.space.country }}</span>
-                        <span v-if="store.space.address"> · {{ store.space.address }}</span>
-                    </p>
-
-                    <hr />
-
-                    <p v-if="store.space.description" class="my-4" style="line-height: 1.8;">
-                        {{ store.space.description }}
-                    </p>
-
-                    <hr />
-
-                    <!-- Amenities -->
-                    <div v-if="store.space.amenities?.length" class="my-4">
-                        <h5 class="fw-semibold mb-3">Amenities</h5>
-                        <div class="row g-2">
-                            <div
-                                v-for="amenity in store.space.amenities"
-                                :key="amenity.id"
-                                class="col-6 col-md-4 d-flex align-items-center gap-2"
-                                style="font-size: 14px;"
-                            >
-                                <span class="text-success">✓</span>
-                                {{ amenity.name }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <!-- Host -->
-                    <div v-if="store.space.host" class="my-4">
-                        <h5 class="fw-semibold mb-3">Hosted by</h5>
-                        <div class="d-flex align-items-center gap-3">
-                            <div
-                                class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
-                                style="width: 48px; height: 48px; font-size: 18px;"
-                            >
-                                {{ store.space.host.name.charAt(0) }}
-                            </div>
-                            <div>
-                                <p class="fw-semibold mb-0">{{ store.space.host.name }}</p>
-                                <p class="text-muted mb-0" style="font-size: 13px;">Space owner</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right: booking card -->
-                <div class="col-12 col-lg-5">
+            <!-- Hero photo gallery -->
+            <div class="py-xl px-lg bg-bg-secondary">
+                <div class="page-container">
                     <div
-                        class="card border-0 shadow p-4 sticky-top"
-                        style="top: 80px; border-radius: 1.25rem;"
+                        v-if="spaceStore.space.photos?.length"
+                        class="grid grid-cols-4 gap-md rounded-lg overflow-hidden"
+                        style="max-height: 480px;"
                     >
-                        <h5 class="fw-bold mb-4">Book this space</h5>
-
-                        <!-- Workspace selection -->
-                        <label class="form-label small fw-semibold mb-2">Workspace type</label>
-                        <div
-                            v-for="workspace in store.space.workspaces"
-                            :key="workspace.id"
-                            class="border rounded-3 p-3 mb-2"
-                            :class="{ 'border-dark border-2': selectedWorkspace?.id === workspace.id }"
-                            style="cursor: pointer; transition: border-color .15s;"
-                            @click="selectWorkspace(workspace)"
-                        >
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p class="fw-semibold mb-0" style="font-size: 14px;">{{ workspace.type?.label }}</p>
-                                    <p class="text-muted mb-0" style="font-size: 12px;">
-                                        Up to {{ workspace.capacity }} person{{ workspace.capacity > 1 ? 's' : '' }}
-                                    </p>
-                                </div>
-                                <p v-if="workspace.price_daily" class="fw-bold mb-0" style="font-size: 14px;">
-                                    ${{ workspace.price_daily }}
-                                    <span class="fw-normal text-muted" style="font-size: 11px;">/day</span>
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Calendar -->
-                        <div v-if="selectedWorkspace" class="mt-4">
-                            <label class="form-label small fw-semibold mb-2">Select dates</label>
-                            <CalendarPicker
-                                :workspace-id="selectedWorkspace.id"
-                                @range-selected="onRangeSelected"
+                        <div class="col-span-2 row-span-2">
+                            <img
+                                :src="`/storage/${spaceStore.space.photos[0].path}`"
+                                class="w-full h-full object-cover"
+                                :alt="spaceStore.space.title"
                             />
                         </div>
+                        <img
+                            v-for="photo in spaceStore.space.photos.slice(1, 3)"
+                            :key="photo.id"
+                            :src="`/storage/${photo.path}`"
+                            class="w-full h-full object-cover"
+                            :alt="spaceStore.space.title"
+                        />
+                    </div>
+                    <div
+                        v-else
+                        class="flex-col-center h-96 bg-bg-tertiary rounded-lg"
+                    >
+                        <span class="text-6xl opacity-30">🏢</span>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Price summary -->
-                        <div v-if="range.start_date && range.end_date" class="mt-4 pt-3 border-top">
-                            <div class="d-flex justify-content-between mb-1" style="font-size: 14px;">
-                                <span class="text-muted">
-                                    {{ nights }} day{{ nights > 1 ? 's' : '' }} × ${{ selectedWorkspace.price_daily }}
-                                </span>
-                                <span>${{ estimatedTotal }}</span>
+            <!-- Content -->
+            <div class="page-container py-3xl">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-2xl">
+                    <!-- Left: info -->
+                    <div class="lg:col-span-2">
+                        <!-- Title & Rating -->
+                        <div class="flex-between gap-md mb-2xl">
+                            <div>
+                                <h1 class="text-heading-xl font-600 text-text-primary mb-md">{{ spaceStore.space.title }}</h1>
+                                <p class="text-body-md text-text-secondary">
+                                    {{ spaceStore.space.city }}<span v-if="spaceStore.space.country">, {{ spaceStore.space.country }}</span>
+                                    <span v-if="spaceStore.space.address"> • {{ spaceStore.space.address }}</span>
+                                </p>
                             </div>
-                            <div class="d-flex justify-content-between fw-bold mt-1">
-                                <span>Total</span>
-                                <span>${{ estimatedTotal }}</span>
+                            <div v-if="spaceStore.space.rating_avg" class="text-right flex-shrink-0">
+                                <p class="text-heading-md font-600 text-text-primary">{{ Number(spaceStore.space.rating_avg).toFixed(1) }}</p>
+                                <p class="text-body-sm text-text-secondary">{{ spaceStore.space.reviews_count }} reviews</p>
                             </div>
                         </div>
 
-                        <!-- CTA -->
-                        <button
-                            v-if="auth.isAuthenticated"
-                            class="btn btn-primary w-100 mt-3"
-                            style="border-radius: .75rem; padding: .75rem;"
-                            :disabled="!canBook || bookingStore.submitting"
-                            @click="submitBooking"
-                        >
-                            {{ bookingStore.submitting ? 'Reserving…' : 'Reserve' }}
-                        </button>
-                        <RouterLink
-                            v-else
-                            to="/login"
-                            class="btn btn-primary w-100 mt-3"
-                            style="border-radius: .75rem; padding: .75rem;"
-                        >
-                            Sign in to book
-                        </RouterLink>
+                        <div class="divider mb-2xl"></div>
 
-                        <p v-if="bookingError" class="text-danger mt-2 mb-0" style="font-size: 13px;">
-                            {{ bookingError }}
-                        </p>
-                        <p v-else class="text-center text-muted mt-2 mb-0" style="font-size: 12px;">
-                            Free cancellation · Instant confirmation
-                        </p>
+                        <!-- Description -->
+                        <div v-if="spaceStore.space.description" class="mb-2xl">
+                            <p class="text-body-md text-text-secondary leading-relaxed">{{ spaceStore.space.description }}</p>
+                        </div>
+
+                        <div class="divider mb-2xl"></div>
+
+                        <!-- Amenities -->
+                        <div v-if="spaceStore.space.amenities?.length" class="mb-2xl">
+                            <h2 class="text-heading-md font-600 text-text-primary mb-lg">Amenities</h2>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-lg">
+                                <div v-for="amenity in spaceStore.space.amenities" :key="amenity.id" class="flex items-start gap-md">
+                                    <span class="text-accent-green text-lg flex-shrink-0">✓</span>
+                                    <span class="text-body-sm text-text-secondary">{{ amenity.name }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider mb-2xl"></div>
+
+                        <!-- Host -->
+                        <div v-if="spaceStore.space.host">
+                            <h2 class="text-heading-md font-600 text-text-primary mb-lg">Hosted by</h2>
+                            <div class="flex items-center gap-lg">
+                                <div class="w-16 h-16 rounded-full bg-accent-violet flex-center text-white font-600 text-xl flex-shrink-0">
+                                    {{ spaceStore.space.host.name.charAt(0) }}
+                                </div>
+                                <div>
+                                    <p class="text-heading-sm font-600 text-text-primary">{{ spaceStore.space.host.name }}</p>
+                                    <p class="text-body-sm text-text-secondary">Space owner</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: booking card -->
+                    <div class="lg:col-span-1">
+                        <Card class="p-xl sticky top-32">
+                            <h3 class="text-heading-md font-600 text-text-primary mb-xl">Book this space</h3>
+
+                            <!-- Workspace selection -->
+                            <div class="mb-xl">
+                                <label class="text-label-md text-text-primary font-600 mb-md block">Workspace Type</label>
+                                <div class="space-y-md">
+                                    <button
+                                        v-for="workspace in spaceStore.space.workspaces"
+                                        :key="workspace.id"
+                                        @click="selectWorkspace(workspace)"
+                                        :class="[
+                                            'w-full p-lg rounded-md border-2 transition-all text-left',
+                                            selectedWorkspace?.id === workspace.id
+                                                ? 'border-accent-violet bg-accent-violet bg-opacity-10'
+                                                : 'border-border-light hover:border-border-medium'
+                                        ]"
+                                    >
+                                        <p class="font-600 text-text-primary mb-xs">{{ workspace.type?.label }}</p>
+                                        <p class="text-body-sm text-text-secondary mb-md">
+                                            Up to {{ workspace.capacity }} person{{ workspace.capacity > 1 ? 's' : '' }}
+                                        </p>
+                                        <PriceTag v-if="workspace.price_daily" :price="workspace.price_daily" period="day" size="sm" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Calendar -->
+                            <div v-if="selectedWorkspace" class="mb-xl">
+                                <label class="text-label-md text-text-primary font-600 mb-md block">Select Dates</label>
+                                <CalendarPicker :workspace-id="selectedWorkspace.id" @range-selected="onRangeSelected" />
+                            </div>
+
+                            <!-- Price summary -->
+                            <div v-if="range.start_date && range.end_date" class="border-t border-border-light pt-xl mb-xl">
+                                <div class="flex-between mb-md">
+                                    <span class="text-body-sm text-text-secondary">{{ nights }} day{{ nights > 1 ? 's' : '' }} × {{ selectedWorkspace.price_daily }}</span>
+                                    <span class="font-mono font-500">${{ estimatedTotal }}</span>
+                                </div>
+                                <div class="flex-between pt-md border-t border-border-light">
+                                    <span class="font-600 text-text-primary">Total</span>
+                                    <span class="font-mono font-600 text-heading-sm">${{ estimatedTotal }}</span>
+                                </div>
+                            </div>
+
+                            <!-- CTA -->
+                            <Button
+                                v-if="auth.isAuthenticated"
+                                variant="primary"
+                                fullWidth
+                                :disabled="!canBook || bookingStore.submitting"
+                                @click="submitBooking"
+                            >
+                                {{ bookingStore.submitting ? 'Reserving...' : 'Reserve Now' }}
+                            </Button>
+                            <RouterLink
+                                v-else
+                                to="/login"
+                                class="btn-primary inline-block w-full text-center"
+                            >
+                                Sign in to Book
+                            </RouterLink>
+
+                            <p v-if="bookingError" class="text-accent-red text-body-sm mt-lg">{{ bookingError }}</p>
+                            <p v-else class="text-body-sm text-text-tertiary text-center mt-lg">
+                                Free cancellation · Instant confirmation
+                            </p>
+                        </Card>
                     </div>
                 </div>
-
             </div>
-        </div>
-    </template>
+        </template>
 
-    <div v-else class="container py-5 text-center text-muted">
-        <div class="mb-3" style="font-size: 3rem;">🔍</div>
-        <p class="fw-medium">Space not found</p>
-        <RouterLink to="/spaces" class="btn btn-primary btn-sm">Back to search</RouterLink>
-    </div>
+        <div v-else class="flex-col-center py-4xl">
+            <div class="text-6xl mb-lg">🔍</div>
+            <h2 class="text-heading-md text-text-primary mb-lg">Space not found</h2>
+            <Button variant="primary" @click="$router.push('/spaces')">Back to Search</Button>
+        </div>
+    </CustomerLayout>
 </template>
