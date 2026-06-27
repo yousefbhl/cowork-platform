@@ -7,6 +7,7 @@ use App\Http\Requests\StoreSpaceRequest;
 use App\Http\Resources\SpaceResource;
 use App\Models\Space;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HostSpaceController extends Controller
 {
@@ -23,13 +24,30 @@ class HostSpaceController extends Controller
 
     public function store(StoreSpaceRequest $request)
     {
-        $space = $request->user()->spaces()->create($request->validated());
+        $space = DB::transaction(function () use ($request) {
+            $space = $request->user()->spaces()->create(
+                $request->safe()->except(['amenities', 'workspaces'])
+            );
 
-        if ($request->amenities) {
-            $space->amenities()->sync($request->amenities);
-        }
+            if ($request->amenities) {
+                $space->amenities()->sync($request->amenities);
+            }
 
-        $space->load(['photos', 'workspaces', 'amenities']);
+            foreach ($request->workspaces as $ws) {
+                $space->workspaces()->create([
+                    'workspace_type_id' => $ws['workspace_type_id'],
+                    'capacity'          => $ws['capacity'],
+                    'price_daily'       => $ws['price_daily'],
+                    'price_hourly'      => $ws['price_hourly'] ?? null,
+                    'price_monthly'     => $ws['price_monthly'] ?? null,
+                    'currency'          => $ws['currency'],
+                ]);
+            }
+
+            return $space;
+        });
+
+        $space->load(['photos', 'workspaces.workspaceType', 'amenities']);
 
         return new SpaceResource($space);
     }

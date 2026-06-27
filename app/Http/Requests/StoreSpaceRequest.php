@@ -20,6 +20,14 @@ class StoreSpaceRequest extends FormRequest
             'country'     => 'nullable|string|max:100',
             'amenities'   => 'nullable|array',
             'amenities.*' => 'exists:amenities,id',
+
+            'workspaces'                        => 'required|array|min:1',
+            'workspaces.*.workspace_type_id'    => 'required|integer|exists:workspace_types,id',
+            'workspaces.*.capacity'             => 'required|integer|min:1',
+            'workspaces.*.price_daily'          => 'required|numeric|min:0',
+            'workspaces.*.price_hourly'         => 'nullable|numeric|min:0',
+            'workspaces.*.price_monthly'        => 'nullable|numeric|min:0',
+            'workspaces.*.currency'             => 'required|string|size:3',
         ];
     }
 }

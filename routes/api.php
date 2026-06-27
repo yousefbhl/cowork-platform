@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminSpaceController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\AmenityController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\WorkspaceTypeController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\Host\HostBookingController;
 use App\Http\Controllers\Host\HostDashboardController;
@@ -29,6 +30,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/spaces/{space}/reviews',                      [ReviewController::class, 'index']);
     Route::get('/workspaces/{workspace}/availability',         [SpaceWorkspaceController::class, 'availability']);
     Route::get('/amenities',                                   [AmenityController::class, 'index']);
+    Route::get('/workspace-types',                             [WorkspaceTypeController::class, 'index']);
 
     // ── Customer ─────────────────────────────────────────
     Route::middleware('auth:sanctum')->group(function () {
