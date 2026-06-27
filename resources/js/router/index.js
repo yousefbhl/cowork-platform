@@ -54,6 +54,12 @@ const routes = [
         component: () => import('@/views/admin/AdminDashboard.vue'),
         meta: { requiresAuth: true, role: 'admin' },
     },
+    {
+        path: '/admin/spaces',
+        name: 'admin.spaces',
+        component: () => import('@/views/admin/AdminSpaces.vue'),
+        meta: { requiresAuth: true, role: 'admin' },
+    },
 
     // ── Catch-all ───────────────────────────────────────
     {
