@@ -99,6 +99,13 @@ onMounted(() => fetchSpaces())
                         {{ counts.all }} space{{ counts.all !== 1 ? 's' : '' }} · {{ counts.published }} live
                     </p>
                 </div>
+                <RouterLink
+                    to="/host/listings/new"
+                    class="btn"
+                    style="background: #2D6A4F; color: #fff; border: none; border-radius: .5rem; font-size: 13px;"
+                >
+                    + New Listing
+                </RouterLink>
             </div>
 
             <!-- Filter tabs -->

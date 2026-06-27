@@ -53,6 +53,12 @@ const routes = [
         meta: { requiresAuth: true, role: 'host' },
     },
     {
+        path: '/host/listings/new',
+        name: 'host.listings.create',
+        component: () => import('@/views/host/CreateListing.vue'),
+        meta: { requiresAuth: true, role: 'host' },
+    },
+    {
         path: '/host/bookings',
         name: 'host.bookings',
         component: () => import('@/views/host/HostBookings.vue'),
