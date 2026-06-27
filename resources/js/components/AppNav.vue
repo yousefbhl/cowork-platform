@@ -12,7 +12,7 @@ async function logout() {
 </script>
 
 <template>
-    <nav class="navbar navbar-expand-lg bg-white border-bottom px-3 px-lg-4">
+    <nav class="navbar bg-white border-bottom px-3 px-lg-4" style="min-height: 57px;">
         <div class="container-fluid">
             <RouterLink to="/" class="navbar-brand fw-bold" style="letter-spacing: -.5px;">
                 CoworkPlatform
@@ -20,6 +20,7 @@ async function logout() {
 
             <div class="d-flex align-items-center gap-2 ms-auto">
                 <template v-if="auth.isAuthenticated">
+                    <!-- Role-specific panel links -->
                     <RouterLink
                         v-if="auth.isHost"
                         to="/host"
@@ -35,33 +36,33 @@ async function logout() {
                         Admin
                     </RouterLink>
 
-                    <div class="dropdown">
-                        <button
-                            class="btn btn-sm btn-light rounded-circle d-flex align-items-center justify-content-center fw-semibold"
-                            style="width: 36px; height: 36px;"
-                            data-bs-toggle="dropdown"
+                    <!-- My bookings (customers only, hide for host/admin) -->
+                    <RouterLink
+                        v-if="auth.isCustomer"
+                        to="/bookings"
+                        class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex"
+                    >
+                        My bookings
+                    </RouterLink>
+
+                    <!-- User identity + always-visible sign-out -->
+                    <div class="d-flex align-items-center gap-2 ps-2 border-start ms-1">
+                        <div
+                            class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-semibold flex-shrink-0"
+                            style="width: 30px; height: 30px; font-size: 12px;"
+                            :title="auth.user.email"
                         >
                             {{ auth.user.name.charAt(0).toUpperCase() }}
+                        </div>
+                        <span
+                            class="text-muted d-none d-md-inline"
+                            style="font-size: 13px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                        >
+                            {{ auth.user.name }}
+                        </span>
+                        <button class="btn btn-sm btn-outline-secondary" @click="logout">
+                            Sign out
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                            <li>
-                                <span class="dropdown-item-text text-muted" style="font-size: 13px;">
-                                    {{ auth.user.email }}
-                                </span>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <RouterLink to="/bookings" class="dropdown-item">
-                                    My bookings
-                                </RouterLink>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <button class="dropdown-item text-danger" @click="logout">
-                                    Sign out
-                                </button>
-                            </li>
-                        </ul>
                     </div>
                 </template>
 

@@ -46,6 +46,18 @@ const routes = [
         component: () => import('@/views/host/HostDashboard.vue'),
         meta: { requiresAuth: true, role: 'host' },
     },
+    {
+        path: '/host/listings',
+        name: 'host.listings',
+        component: () => import('@/views/host/MyListings.vue'),
+        meta: { requiresAuth: true, role: 'host' },
+    },
+    {
+        path: '/host/bookings',
+        name: 'host.bookings',
+        component: () => import('@/views/host/HostBookings.vue'),
+        meta: { requiresAuth: true, role: 'host' },
+    },
 
     // ── Admin ───────────────────────────────────────────
     {
