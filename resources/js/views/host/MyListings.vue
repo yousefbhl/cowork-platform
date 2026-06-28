@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import api from '@/api'
+import { photoUrl } from '@/utils/photoUrl'
 
 const auth   = useAuthStore()
 const router = useRouter()
@@ -165,7 +166,7 @@ onMounted(() => fetchSpaces())
                     <div style="width: 130px; flex-shrink: 0; background: #F7F4EF; overflow: hidden;">
                         <img
                             v-if="space.cover_photo"
-                            :src="`/storage/${space.cover_photo}`"
+                            :src="photoUrl(space.cover_photo)"
                             :alt="space.title"
                             class="w-100 h-100 object-fit-cover"
                             style="aspect-ratio: 4/3;"

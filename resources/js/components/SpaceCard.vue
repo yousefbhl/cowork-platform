@@ -1,4 +1,6 @@
 <script setup>
+import { photoUrl } from '@/utils/photoUrl'
+
 defineProps({
     space: { type: Object, required: true },
 })
@@ -20,7 +22,7 @@ function formatPrice(workspaces) {
         <div class="space-card__photo">
             <img
                 v-if="space.cover_photo"
-                :src="`/storage/${space.cover_photo}`"
+                :src="photoUrl(space.cover_photo)"
                 :alt="space.title"
                 class="w-100 h-100 object-fit-cover"
                 loading="lazy"

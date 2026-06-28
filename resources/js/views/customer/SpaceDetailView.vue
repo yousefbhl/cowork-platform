@@ -6,6 +6,7 @@ import { useBookingStore } from '@/stores/booking'
 import { useAuthStore } from '@/stores/auth'
 import AppNav from '@/components/AppNav.vue'
 import CalendarPicker from '@/components/CalendarPicker.vue'
+import { photoUrl } from '@/utils/photoUrl'
 
 const route        = useRoute()
 const router       = useRouter()
@@ -81,7 +82,7 @@ onMounted(() => store.fetchSpace(route.params.slug))
             >
                 <div class="col-8">
                     <img
-                        :src="`/storage/${store.space.photos[0].path}`"
+                        :src="photoUrl(store.space.photos[0].path)"
                         class="w-100 h-100 object-fit-cover"
                         style="border-radius: 1rem 0 0 1rem;"
                         :alt="store.space.title"
@@ -91,7 +92,7 @@ onMounted(() => store.fetchSpace(route.params.slug))
                     <img
                         v-for="photo in store.space.photos.slice(1, 3)"
                         :key="photo.id"
-                        :src="`/storage/${photo.path}`"
+                        :src="photoUrl(photo.path)"
                         class="w-100 object-fit-cover flex-grow-1"
                         :alt="store.space.title"
                     />
