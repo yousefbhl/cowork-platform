@@ -182,14 +182,19 @@ onMounted(() => fetchBookings())
                 <div
                     v-for="n in 5"
                     :key="n"
-                    class="d-flex align-items-center gap-3 px-4 py-3 placeholder-glow"
+                    class="d-flex align-items-center gap-3 px-4 py-3"
                     :class="n < 5 ? 'border-bottom' : ''"
+                    style="background: #fff;"
                 >
-                    <span class="placeholder rounded col-3"></span>
-                    <span class="placeholder rounded col-2"></span>
-                    <span class="placeholder rounded col-2"></span>
-                    <span class="placeholder rounded col-1 ms-auto"></span>
-                    <span class="placeholder rounded col-1"></span>
+                    <div class="sk" style="height: 14px; width: 22%;"></div>
+                    <div class="sk" style="height: 14px; width: 13%;"></div>
+                    <div class="sk" style="height: 14px; width: 17%;"></div>
+                    <div class="sk ms-auto" style="height: 22px; width: 72px; border-radius: 20px;"></div>
+                    <div class="sk" style="height: 14px; width: 54px;"></div>
+                    <div class="d-flex gap-1">
+                        <div class="sk" style="height: 28px; width: 66px; border-radius: 6px;"></div>
+                        <div class="sk" style="height: 28px; width: 58px; border-radius: 6px;"></div>
+                    </div>
                 </div>
             </div>
 
@@ -290,18 +295,32 @@ onMounted(() => fetchBookings())
             </div>
 
             <!-- Empty state -->
-            <div v-else class="text-center py-5">
-                <div class="mb-3" style="font-size: 3rem;">🌿</div>
-                <p class="fw-semibold mb-1" style="color: #2D6A4F; font-size: 15px;">
+            <div
+                v-else
+                class="text-center py-5 d-flex flex-column align-items-center justify-content-center"
+                style="min-height: 300px;"
+            >
+                <div
+                    class="d-flex align-items-center justify-content-center rounded-circle mb-4"
+                    style="width: 80px; height: 80px; background: #EEEAE3;"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#707973" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                </div>
+                <h2 class="fw-semibold mb-2" style="font-size: 18px; color: #1A1A18;">
                     {{
-                        filter === 'all'       ? 'No bookings yet'           :
-                        filter === 'pending'   ? 'No pending bookings'       :
-                        filter === 'confirmed' ? 'No confirmed bookings'     :
+                        filter === 'all'       ? 'No bookings yet'       :
+                        filter === 'pending'   ? 'No pending bookings'   :
+                        filter === 'confirmed' ? 'No confirmed bookings' :
                                                  'No cancelled bookings'
                     }}
-                </p>
-                <p class="text-muted" style="font-size: 13px;">
-                    {{ filter === 'all' ? 'Customer reservations will appear here' : 'Try switching the filter above' }}
+                </h2>
+                <p style="font-size: 13px; color: #6B6660; max-width: 300px;">
+                    {{ filter === 'all' ? 'Customer reservations will appear here once guests start booking your spaces.' : 'Try switching the filter above.' }}
                 </p>
             </div>
 

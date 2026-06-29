@@ -143,13 +143,21 @@ onMounted(() => fetchSpaces())
                 <div
                     v-for="n in 4"
                     :key="n"
-                    class="card border-0 shadow-sm d-flex flex-row placeholder-glow overflow-hidden"
-                    style="border-radius: .75rem; height: 100px;"
+                    class="card border-0 shadow-sm d-flex flex-row overflow-hidden"
+                    style="border-radius: .75rem; height: 104px; background: #fff;"
                 >
-                    <div style="width: 120px; background: #e9ecef; flex-shrink: 0;"></div>
-                    <div class="card-body d-flex flex-column gap-2 justify-content-center">
-                        <span class="placeholder rounded col-4"></span>
-                        <span class="placeholder rounded col-3"></span>
+                    <div class="sk" style="width: 120px; flex-shrink: 0; border-radius: 0;"></div>
+                    <div class="card-body d-flex flex-column gap-2 justify-content-center px-4 py-3">
+                        <div class="sk" style="height: 14px; width: 55%;"></div>
+                        <div class="sk" style="height: 12px; width: 35%;"></div>
+                        <div class="d-flex gap-2">
+                            <div class="sk" style="height: 20px; width: 72px; border-radius: 12px;"></div>
+                            <div class="sk" style="height: 20px; width: 88px;"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column align-items-end justify-content-center pe-4 gap-2">
+                        <div class="sk" style="height: 16px; width: 56px;"></div>
+                        <div class="sk" style="height: 28px; width: 108px; border-radius: 8px;"></div>
                     </div>
                 </div>
             </div>
@@ -238,14 +246,34 @@ onMounted(() => fetchSpaces())
             </div>
 
             <!-- Empty state -->
-            <div v-else-if="!loading" class="text-center py-5">
-                <div class="mb-3" style="font-size: 3rem;">🌿</div>
-                <p class="fw-semibold mb-1" style="color: #2D6A4F; font-size: 15px;">
+            <div
+                v-if="!loading && !filtered.length"
+                class="text-center py-5 d-flex flex-column align-items-center justify-content-center"
+                style="min-height: 300px;"
+            >
+                <div
+                    class="d-flex align-items-center justify-content-center rounded-circle mb-4"
+                    style="width: 80px; height: 80px; background: #EEEAE3;"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#707973" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </div>
+                <h2 class="fw-semibold mb-2" style="font-size: 18px; color: #1A1A18;">
                     {{ filter === 'all' ? 'No listings yet' : `No ${filter === 'draft' ? 'pending' : filter} listings` }}
+                </h2>
+                <p class="mb-4" style="font-size: 13px; color: #6B6660; max-width: 280px;">
+                    {{ filter === 'all' ? 'Create your first space to start accepting bookings.' : 'Try switching the filter above.' }}
                 </p>
-                <p class="text-muted" style="font-size: 13px;">
-                    {{ filter === 'all' ? 'Your spaces will appear here once created' : 'Try switching the filter above' }}
-                </p>
+                <RouterLink
+                    v-if="filter === 'all'"
+                    to="/host/listings/new"
+                    class="btn px-5 py-2"
+                    style="background: #1B4332; color: #fff; border-radius: 9999px; font-size: 14px; font-weight: 600; border: none;"
+                >
+                    + Create your first listing
+                </RouterLink>
             </div>
 
         </div>

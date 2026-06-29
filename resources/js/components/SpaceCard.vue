@@ -1,9 +1,14 @@
 <script setup>
 import { photoUrl } from '@/utils/photoUrl'
+import { useAuthStore } from '@/stores/auth'
+import { useWishlistStore } from '@/stores/wishlist'
 
 defineProps({
     space: { type: Object, required: true },
 })
+
+const auth     = useAuthStore()
+const wishlist = useWishlistStore()
 
 function formatPrice(workspaces) {
     if (!workspaces?.length) return null
@@ -30,6 +35,41 @@ function formatPrice(workspaces) {
             <div v-else class="space-card__no-photo d-flex align-items-center justify-content-center">
                 <span style="font-size: 2rem; opacity: .3;">🏢</span>
             </div>
+
+            <!-- Heart toggle -->
+            <button
+                v-if="auth.isAuthenticated"
+                class="space-card__heart"
+                :aria-label="wishlist.isSaved(space.id) ? 'Remove from wishlist' : 'Save to wishlist'"
+                @click.prevent.stop="wishlist.toggle(space)"
+            >
+                <svg
+                    v-if="wishlist.isSaved(space.id)"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20" height="20"
+                    viewBox="0 0 24 24"
+                    fill="#ef4444"
+                    stroke="#ef4444"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                <svg
+                    v-else
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20" height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+            </button>
         </div>
 
         <!-- Body -->
@@ -80,6 +120,7 @@ function formatPrice(workspaces) {
 }
 
 .space-card__photo {
+    position: relative;
     width: 100%;
     aspect-ratio: 16 / 10;
     background: #f1f0ea;
@@ -90,5 +131,28 @@ function formatPrice(workspaces) {
     width: 100%;
     height: 100%;
     background: #f1f0ea;
+}
+
+.space-card__heart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.25);
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background 0.15s ease, transform 0.1s ease;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35));
+}
+
+.space-card__heart:hover {
+    background: rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
 }
 </style>

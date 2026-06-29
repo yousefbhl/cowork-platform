@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useWishlistStore } from '@/stores/wishlist'
 
 const routes = [
     // ── Public ──────────────────────────────────────────
@@ -36,6 +37,18 @@ const routes = [
         path: '/bookings',
         name: 'bookings',
         component: () => import('@/views/customer/BookingsView.vue'),
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/profile',
+        name: 'profile',
+        component: () => import('@/views/customer/ProfileView.vue'),
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/wishlist',
+        name: 'wishlist',
+        component: () => import('@/views/customer/WishlistView.vue'),
         meta: { requiresAuth: true },
     },
 
@@ -96,6 +109,10 @@ router.beforeEach(async (to) => {
 
     if (!auth.user && auth.token) {
         await auth.fetchUser()
+    }
+
+    if (auth.isAuthenticated) {
+        useWishlistStore().ensureLoaded()
     }
 
     if (to.meta.guestOnly && auth.isAuthenticated) {

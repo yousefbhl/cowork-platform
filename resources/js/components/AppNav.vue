@@ -44,22 +44,34 @@ async function logout() {
                     >
                         My bookings
                     </RouterLink>
+                    <RouterLink
+                        v-if="auth.isCustomer"
+                        to="/wishlist"
+                        class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex align-items-center gap-1"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                        Wishlist
+                    </RouterLink>
 
                     <!-- User identity + always-visible sign-out -->
                     <div class="d-flex align-items-center gap-2 ps-2 border-start ms-1">
-                        <div
-                            class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-semibold flex-shrink-0"
+                        <RouterLink
+                            to="/profile"
+                            class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-semibold flex-shrink-0 text-decoration-none"
                             style="width: 30px; height: 30px; font-size: 12px;"
-                            :title="auth.user.email"
+                            :title="`${auth.user.name} — Settings`"
                         >
                             {{ auth.user.name.charAt(0).toUpperCase() }}
-                        </div>
-                        <span
-                            class="text-muted d-none d-md-inline"
+                        </RouterLink>
+                        <RouterLink
+                            to="/profile"
+                            class="text-muted text-decoration-none d-none d-md-inline"
                             style="font-size: 13px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
                         >
                             {{ auth.user.name }}
-                        </span>
+                        </RouterLink>
                         <button class="btn btn-sm btn-outline-secondary" @click="logout">
                             Sign out
                         </button>

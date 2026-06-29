@@ -11,8 +11,10 @@ use App\Http\Controllers\Host\HostBookingController;
 use App\Http\Controllers\Host\HostDashboardController;
 use App\Http\Controllers\Host\HostSpaceController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SpaceController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\SpaceWorkspaceController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +36,11 @@ Route::prefix('v1')->group(function () {
 
     // ── Customer ─────────────────────────────────────────
     Route::middleware('auth:sanctum')->group(function () {
+        Route::patch('/profile',          [ProfileController::class, 'updateProfile']);
+        Route::patch('/profile/password', [ProfileController::class, 'updatePassword']);
+        Route::get('/wishlist',           [WishlistController::class, 'index']);
+        Route::post('/wishlist/{space}',  [WishlistController::class, 'store']);
+        Route::delete('/wishlist/{space}', [WishlistController::class, 'destroy']);
         Route::get('/bookings',                                [BookingController::class, 'index']);
         Route::post('/bookings',                               [BookingController::class, 'store']);
         Route::get('/bookings/{booking}',                      [BookingController::class, 'show']);

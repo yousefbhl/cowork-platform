@@ -24,3 +24,16 @@ a {
     text-decoration: none;
     color: inherit;
 }
+
+// Skeleton shimmer
+.sk {
+    background-image: linear-gradient(90deg, #EEEAE3 0%, #E4DFD7 50%, #EEEAE3 100%);
+    background-size: 200% 100%;
+    animation: sk-shimmer 2s linear infinite;
+    border-radius: 4px;
+}
+
+@keyframes sk-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

@@ -38,6 +38,13 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class, 'customer_id');
     }
 
+    public function wishlistedSpaces()
+    {
+        return $this->belongsToMany(Space::class, 'wishlists')
+            ->withTimestamps()
+            ->latest('wishlists.created_at');
+    }
+
     public function isHost(): bool
     {
         return $this->role === 'host';
