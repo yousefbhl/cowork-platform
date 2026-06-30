@@ -41,6 +41,11 @@ function isPast(date) {
     const today = new Date(); today.setHours(0, 0, 0, 0)
     return date < today
 }
+function isToday(date) {
+    if (!date) return false
+    const today = new Date()
+    return toISO(date) === toISO(today)
+}
 function isStart(date)   { return date && startDate.value && toISO(date) === toISO(startDate.value) }
 function isEnd(date)     { return date && endDate.value   && toISO(date) === toISO(endDate.value) }
 function isInRange(date) {
@@ -51,20 +56,17 @@ function isInRange(date) {
 function selectDate(date) {
     if (!date || isBooked(date) || isPast(date)) return
 
-    // First click or re-start after a completed selection
     if (!startDate.value || (startDate.value && endDate.value)) {
         startDate.value = date
         endDate.value   = null
         return
     }
 
-    // Second click must be after start
     if (date <= startDate.value) {
         startDate.value = date
         return
     }
 
-    // Reject range that spans a booked day
     const blocked = bookedDays.value.some(bd => {
         const d = new Date(bd)
         return d >= startDate.value && d < date
@@ -102,22 +104,21 @@ onMounted(loadAvailability)
 </script>
 
 <template>
-    <div class="calendar">
+    <div class="lf-calendar">
         <!-- Nav -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <button class="btn btn-sm btn-light px-2" @click="prevMonth">‹</button>
-            <span class="fw-semibold" style="font-size: 14px;">{{ monthLabel }}</span>
-            <button class="btn btn-sm btn-light px-2" @click="nextMonth">›</button>
+            <button class="lf-cal-nav" aria-label="Previous month" @click="prevMonth">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span class="fw-semibold" style="font-size: 15px; color: #1A1A18;">{{ monthLabel }}</span>
+            <button class="lf-cal-nav" aria-label="Next month" @click="nextMonth">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
         </div>
 
         <!-- Weekday headers -->
         <div class="cal-grid mb-1">
-            <div
-                v-for="d in ['Su','Mo','Tu','We','Th','Fr','Sa']"
-                :key="d"
-                class="text-center text-muted"
-                style="font-size: 10px; font-weight: 600; padding-bottom: 4px;"
-            >{{ d }}</div>
+            <div v-for="d in ['Su','Mo','Tu','We','Th','Fr','Sa']" :key="d" class="text-center label-caps" style="color: #A09890; padding-bottom: 6px;">{{ d }}</div>
         </div>
 
         <!-- Day cells -->
@@ -130,6 +131,7 @@ onMounted(loadAvailability)
                     'cal-cell--empty':  !date,
                     'cal-cell--booked': isBooked(date),
                     'cal-cell--past':   isPast(date),
+                    'cal-cell--today':  isToday(date) && !isStart(date) && !isEnd(date),
                     'cal-cell--start':  isStart(date),
                     'cal-cell--end':    isEnd(date),
                     'cal-cell--range':  isInRange(date),
@@ -141,42 +143,33 @@ onMounted(loadAvailability)
         </div>
 
         <!-- Legend -->
-        <div class="d-flex gap-3 mt-3" style="font-size: 11px; color: #6c757d;">
-            <span class="d-flex align-items-center gap-1">
-                <span class="leg-dot" style="background: #1a1a2e;"></span> Selected
-            </span>
-            <span class="d-flex align-items-center gap-1">
-                <span class="leg-dot" style="background: #dee2e6;"></span> Unavailable
-            </span>
+        <div class="d-flex gap-3 mt-3" style="font-size: 11px; color: #6B6660;">
+            <span class="d-flex align-items-center gap-1"><span class="leg-dot" style="background: #2D6A4F;"></span> Selected</span>
+            <span class="d-flex align-items-center gap-1"><span class="leg-dot" style="background: #D4CEC6;"></span> Unavailable</span>
         </div>
     </div>
 </template>
 
 <style scoped>
-.cal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.lf-cal-nav {
+    width: 30px; height: 30px; border-radius: 8px;
+    border: 1px solid #E4DFD7; background: #fff; color: #6B6660;
+    display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: border-color .12s, color .12s;
 }
+.lf-cal-nav:hover { border-color: #B8B2A8; color: #1A1A18; }
 .cal-cell {
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background .1s;
-    user-select: none;
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #1A1A18; border-radius: 8px; cursor: pointer;
+    transition: background .1s; user-select: none;
 }
-.cal-cell:not(.cal-cell--empty):not(.cal-cell--booked):not(.cal-cell--past):hover {
-    background: #f1f0ea;
-}
+.cal-cell:not(.cal-cell--empty):not(.cal-cell--booked):not(.cal-cell--past):hover { background: rgba(45,106,79,.10); }
 .cal-cell--empty  { cursor: default; }
-.cal-cell--booked { background: #e9ecef; color: #adb5bd; text-decoration: line-through; cursor: not-allowed; }
-.cal-cell--past   { color: #ced4da; cursor: not-allowed; }
-.cal-cell--start,
-.cal-cell--end    { background: #1a1a2e !important; color: #fff; font-weight: 600; border-radius: 6px; }
-.cal-cell--range  { background: #d6d5e8; border-radius: 0; }
+.cal-cell--booked { color: #D4CEC6; text-decoration: line-through; cursor: not-allowed; }
+.cal-cell--past   { color: #D4CEC6; cursor: not-allowed; }
+.cal-cell--today  { box-shadow: inset 0 -2px 0 #D4930A; }
+.cal-cell--start, .cal-cell--end { background: #2D6A4F !important; color: #fff; font-weight: 600; }
+.cal-cell--range  { background: rgba(45,106,79,.12); color: #1B4332; border-radius: 0; }
 .leg-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 </style>

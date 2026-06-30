@@ -20,6 +20,8 @@ const passwordErrors  = ref({})
 const passwordSuccess = ref(false)
 const passwordSaving  = ref(false)
 
+const section = ref('profile')
+
 onMounted(() => {
     profile.name  = auth.user?.name  ?? ''
     profile.email = auth.user?.email ?? ''
@@ -71,135 +73,72 @@ const ROLE_LABEL = { customer: 'Customer', host: 'Host', admin: 'Admin' }
 <template>
     <AppNav />
 
-    <div style="background: #F7F4EF; min-height: calc(100vh - 57px);">
-        <div class="container py-5" style="max-width: 880px;">
+    <div class="bg-linen" style="min-height: calc(100vh - 68px);">
+        <div class="container py-5" style="max-width: 980px;">
 
             <!-- Page header -->
-            <div class="mb-5">
-                <h1 class="fw-bold mb-1" style="font-size: 24px; color: #1B4332; letter-spacing: -.3px;">Account Settings</h1>
-                <p class="text-muted mb-0" style="font-size: 14px;">Manage your profile and security preferences.</p>
+            <div class="mb-4">
+                <h1 class="headline-lg mb-1" style="color: #1A1A18;">Account Settings</h1>
+                <p class="mb-0" style="font-size: 14px; color: #6B6660;">Manage your profile, preferences, and security.</p>
             </div>
 
             <div class="row g-4 align-items-start">
 
                 <!-- Sidebar -->
-                <div class="col-12 col-md-3">
-                    <div
-                        class="card border-0 shadow-sm p-4 mb-3 text-center"
-                        style="border-radius: .75rem; background: #fff; border: 1px solid #E4DFD7 !important;"
-                    >
-                        <div
-                            class="rounded-circle d-flex align-items-center justify-content-center fw-bold mx-auto mb-3"
-                            style="width: 56px; height: 56px; background: #2D6A4F; color: #fff; font-size: 20px;"
-                        >
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="lf-card p-3 mb-3 d-flex align-items-center gap-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 44px; height: 44px; background: #2D6A4F; color: #fff; font-size: 17px;">
                             {{ initials }}
                         </div>
-                        <p class="fw-semibold mb-0 text-truncate" style="font-size: 14px; color: #1A1A18;">{{ auth.user?.name }}</p>
-                        <p class="mb-2" style="font-size: 11px; color: #A09890; word-break: break-all;">{{ auth.user?.email }}</p>
-                        <span
-                            class="badge rounded-pill"
-                            style="background: #dcfce7; color: #1B4332; font-size: 11px; font-weight: 500; padding: .3em .8em;"
-                        >
-                            {{ ROLE_LABEL[auth.user?.role] ?? auth.user?.role }}
-                        </span>
+                        <div style="min-width: 0;">
+                            <p class="fw-semibold mb-0 text-truncate" style="font-size: 14px; color: #1A1A18;">{{ auth.user?.name }}</p>
+                            <p class="mb-0 text-truncate" style="font-size: 12px; color: #A09890;">{{ auth.user?.email }}</p>
+                        </div>
                     </div>
 
                     <div class="d-flex flex-column gap-1">
-                        <a
-                            href="#profile-section"
-                            class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 text-decoration-none"
-                            style="background: #E4DFD7; color: #1B4332; font-size: 14px; font-weight: 500;"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-                            </svg>
+                        <button type="button" class="lf-profile-nav" :class="{ active: section === 'profile' }" @click="section = 'profile'">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
                             Profile
-                        </a>
-                        <a
-                            href="#password-section"
-                            class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 text-decoration-none"
-                            style="color: #6B6660; font-size: 14px;"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                            </svg>
+                        </button>
+                        <button type="button" class="lf-profile-nav" :class="{ active: section === 'security' }" @click="section = 'security'">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                             Security
-                        </a>
+                        </button>
+                        <div class="px-3 pt-3">
+                            <span class="lf-badge lf-badge--available">{{ ROLE_LABEL[auth.user?.role] ?? auth.user?.role }}</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Content -->
-                <div class="col-12 col-md-9">
+                <div class="col-12 col-md-8 col-lg-9">
 
                     <!-- Profile card -->
-                    <div
-                        id="profile-section"
-                        class="card border-0 shadow-sm mb-4"
-                        style="border-radius: .75rem; border: 1px solid #E4DFD7 !important;"
-                    >
-                        <div
-                            class="card-header bg-white px-4 py-3"
-                            style="border-radius: .75rem .75rem 0 0; border-bottom: 1px solid #E4DFD7;"
-                        >
-                            <h2 class="fw-semibold mb-0" style="font-size: 15px; color: #1A1A18;">Profile</h2>
-                            <p class="text-muted mb-0 mt-1" style="font-size: 13px;">Update your display name and email address.</p>
+                    <div v-show="section === 'profile'" class="lf-card overflow-hidden">
+                        <div class="px-4 py-3" style="border-bottom: 1px solid #E4DFD7;">
+                            <h2 class="headline-sm mb-1" style="color: #1A1A18;">Public Profile</h2>
+                            <p class="mb-0" style="font-size: 13px; color: #6B6660;">Update your display name and email address.</p>
                         </div>
-
-                        <div class="card-body px-4 py-4">
-                            <div
-                                v-if="profileSuccess"
-                                class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 mb-4"
-                                style="background: #dcfce7; color: #1B4332; font-size: 13px;"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        <div class="px-4 py-4">
+                            <div v-if="profileSuccess" class="d-flex align-items-center gap-2 px-3 py-2 mb-4" style="background: rgba(45,106,79,.10); color: #1B4332; font-size: 13px; border-radius: 8px;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 Profile updated successfully.
                             </div>
 
                             <div class="mb-3">
-                                <label
-                                    class="form-label"
-                                    style="font-size: 11px; font-weight: 600; letter-spacing: .05em; color: #6B6660; text-transform: uppercase;"
-                                >
-                                    Full name
-                                </label>
-                                <input
-                                    v-model="profile.name"
-                                    type="text"
-                                    class="form-control"
-                                    :class="{ 'is-invalid': profileErrors.name }"
-                                    placeholder="Your full name"
-                                    style="border-color: #D4CEC6; border-radius: .5rem;"
-                                    @input="profileSuccess = false"
-                                />
+                                <label class="form-label">Full name</label>
+                                <input v-model="profile.name" type="text" class="form-control py-2" :class="{ 'is-invalid': profileErrors.name }" placeholder="Your full name" @input="profileSuccess = false" />
                                 <div v-if="profileErrors.name" class="invalid-feedback">{{ profileErrors.name[0] }}</div>
                             </div>
-
                             <div class="mb-4">
-                                <label
-                                    class="form-label"
-                                    style="font-size: 11px; font-weight: 600; letter-spacing: .05em; color: #6B6660; text-transform: uppercase;"
-                                >
-                                    Email address
-                                </label>
-                                <input
-                                    v-model="profile.email"
-                                    type="email"
-                                    class="form-control"
-                                    :class="{ 'is-invalid': profileErrors.email }"
-                                    placeholder="you@example.com"
-                                    style="border-color: #D4CEC6; border-radius: .5rem;"
-                                    @input="profileSuccess = false"
-                                />
+                                <label class="form-label">Email address</label>
+                                <input v-model="profile.email" type="email" class="form-control py-2" :class="{ 'is-invalid': profileErrors.email }" placeholder="you@example.com" @input="profileSuccess = false" />
                                 <div v-if="profileErrors.email" class="invalid-feedback">{{ profileErrors.email[0] }}</div>
                             </div>
 
                             <div class="d-flex justify-content-end">
-                                <button
-                                    class="btn px-5 py-2"
-                                    style="background: #1B4332; color: #fff; border-radius: 9999px; font-size: 14px; font-weight: 600; border: none;"
-                                    :disabled="profileSaving"
-                                    @click="saveProfile"
-                                >
+                                <button class="btn btn-primary px-4 py-2" :disabled="profileSaving" @click="saveProfile">
                                     {{ profileSaving ? 'Saving…' : 'Save changes' }}
                                 </button>
                             </div>
@@ -207,93 +146,35 @@ const ROLE_LABEL = { customer: 'Customer', host: 'Host', admin: 'Admin' }
                     </div>
 
                     <!-- Password card -->
-                    <div
-                        id="password-section"
-                        class="card border-0 shadow-sm"
-                        style="border-radius: .75rem; border: 1px solid #E4DFD7 !important;"
-                    >
-                        <div
-                            class="card-header bg-white px-4 py-3"
-                            style="border-radius: .75rem .75rem 0 0; border-bottom: 1px solid #E4DFD7;"
-                        >
-                            <h2 class="fw-semibold mb-0" style="font-size: 15px; color: #1A1A18;">Security</h2>
-                            <p class="text-muted mb-0 mt-1" style="font-size: 13px;">You'll need your current password to make changes.</p>
+                    <div v-show="section === 'security'" class="lf-card overflow-hidden">
+                        <div class="px-4 py-3" style="border-bottom: 1px solid #E4DFD7;">
+                            <h2 class="headline-sm mb-1" style="color: #1A1A18;">Security</h2>
+                            <p class="mb-0" style="font-size: 13px; color: #6B6660;">You'll need your current password to make changes.</p>
                         </div>
-
-                        <div class="card-body px-4 py-4">
-                            <div
-                                v-if="passwordSuccess"
-                                class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 mb-4"
-                                style="background: #dcfce7; color: #1B4332; font-size: 13px;"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        <div class="px-4 py-4">
+                            <div v-if="passwordSuccess" class="d-flex align-items-center gap-2 px-3 py-2 mb-4" style="background: rgba(45,106,79,.10); color: #1B4332; font-size: 13px; border-radius: 8px;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 Password changed successfully.
                             </div>
 
                             <div class="mb-3">
-                                <label
-                                    class="form-label"
-                                    style="font-size: 11px; font-weight: 600; letter-spacing: .05em; color: #6B6660; text-transform: uppercase;"
-                                >
-                                    Current password
-                                </label>
-                                <input
-                                    v-model="password.current_password"
-                                    type="password"
-                                    class="form-control"
-                                    :class="{ 'is-invalid': passwordErrors.current_password }"
-                                    placeholder="Your current password"
-                                    style="border-color: #D4CEC6; border-radius: .5rem;"
-                                    @input="passwordSuccess = false"
-                                />
+                                <label class="form-label">Current password</label>
+                                <input v-model="password.current_password" type="password" class="form-control py-2" :class="{ 'is-invalid': passwordErrors.current_password }" placeholder="Your current password" @input="passwordSuccess = false" />
                                 <div v-if="passwordErrors.current_password" class="invalid-feedback">{{ passwordErrors.current_password[0] }}</div>
                             </div>
-
                             <div class="mb-3">
-                                <label
-                                    class="form-label"
-                                    style="font-size: 11px; font-weight: 600; letter-spacing: .05em; color: #6B6660; text-transform: uppercase;"
-                                >
-                                    New password
-                                </label>
-                                <input
-                                    v-model="password.new_password"
-                                    type="password"
-                                    class="form-control"
-                                    :class="{ 'is-invalid': passwordErrors.new_password }"
-                                    placeholder="At least 8 characters"
-                                    style="border-color: #D4CEC6; border-radius: .5rem;"
-                                    @input="passwordSuccess = false"
-                                />
+                                <label class="form-label">New password</label>
+                                <input v-model="password.new_password" type="password" class="form-control py-2" :class="{ 'is-invalid': passwordErrors.new_password }" placeholder="At least 8 characters" @input="passwordSuccess = false" />
                                 <div v-if="passwordErrors.new_password" class="invalid-feedback">{{ passwordErrors.new_password[0] }}</div>
                             </div>
-
                             <div class="mb-4">
-                                <label
-                                    class="form-label"
-                                    style="font-size: 11px; font-weight: 600; letter-spacing: .05em; color: #6B6660; text-transform: uppercase;"
-                                >
-                                    Confirm new password
-                                </label>
-                                <input
-                                    v-model="password.new_password_confirmation"
-                                    type="password"
-                                    class="form-control"
-                                    :class="{ 'is-invalid': passwordErrors.new_password_confirmation }"
-                                    placeholder="Repeat new password"
-                                    style="border-color: #D4CEC6; border-radius: .5rem;"
-                                    @input="passwordSuccess = false"
-                                />
+                                <label class="form-label">Confirm new password</label>
+                                <input v-model="password.new_password_confirmation" type="password" class="form-control py-2" :class="{ 'is-invalid': passwordErrors.new_password_confirmation }" placeholder="Repeat new password" @input="passwordSuccess = false" />
                                 <div v-if="passwordErrors.new_password_confirmation" class="invalid-feedback">{{ passwordErrors.new_password_confirmation[0] }}</div>
                             </div>
 
                             <div class="d-flex justify-content-end">
-                                <button
-                                    class="btn px-5 py-2"
-                                    style="background: #1B4332; color: #fff; border-radius: 9999px; font-size: 14px; font-weight: 600; border: none;"
-                                    :disabled="passwordSaving"
-                                    @click="savePassword"
-                                >
+                                <button class="btn btn-primary px-4 py-2" :disabled="passwordSaving" @click="savePassword">
                                     {{ passwordSaving ? 'Updating…' : 'Update password' }}
                                 </button>
                             </div>
@@ -306,3 +187,15 @@ const ROLE_LABEL = { customer: 'Customer', host: 'Host', admin: 'Admin' }
         </div>
     </div>
 </template>
+
+<style scoped>
+.lf-profile-nav {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left; border: none; background: transparent;
+    color: #6B6660; font-size: 14px; font-weight: 500;
+    padding: 9px 14px; border-radius: 8px; cursor: pointer;
+    transition: background .12s, color .12s;
+}
+.lf-profile-nav:hover { background: rgba(45,106,79,.06); color: #1A1A18; }
+.lf-profile-nav.active { background: #E4DFD7; color: #1B4332; font-weight: 600; }
+</style>

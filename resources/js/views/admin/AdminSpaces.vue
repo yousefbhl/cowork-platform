@@ -1,11 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
 import api from '@/api'
-
-const auth   = useAuthStore()
-const router = useRouter()
+import AdminSidebar from '@/components/AdminSidebar.vue'
 
 const spaces      = ref([])
 const meta        = ref({})
@@ -13,19 +9,17 @@ const loading     = ref(false)
 const actionError = ref(null)
 const filter      = ref('all')
 
-// ── Status display maps ──────────────────────────────────────────────────────
 const STATUS_LABEL = {
     draft:     'Pending review',
     published: 'Live',
     paused:    'Paused',
 }
-const STATUS_STYLE = {
-    draft:     'color: #92400e; background: #fef3c7;',
-    published: 'color: #1B4332; background: #dcfce7;',
-    paused:    'color: #991b1b; background: #fee2e2;',
+const STATUS_BADGE = {
+    draft:     'lf-badge--pending',
+    published: 'lf-badge--confirmed',
+    paused:    'lf-badge--completed',
 }
 
-// ── Counts for filter tabs ───────────────────────────────────────────────────
 const counts = computed(() => ({
     all:       spaces.value.length,
     draft:     spaces.value.filter(s => s.status === 'draft').length,
@@ -39,7 +33,6 @@ const filtered = computed(() =>
         : spaces.value.filter(s => s.status === filter.value)
 )
 
-// ── Data fetching ────────────────────────────────────────────────────────────
 async function fetchSpaces(page = 1) {
     loading.value     = true
     actionError.value = null
@@ -54,7 +47,6 @@ async function fetchSpaces(page = 1) {
     }
 }
 
-// ── Actions (optimistic) ─────────────────────────────────────────────────────
 async function approve(space) {
     const prev = space.status
     space.status      = 'published'
@@ -79,183 +71,89 @@ async function reject(space) {
     }
 }
 
-async function handleLogout() {
-    await auth.logout()
-    router.push('/login')
-}
-
 onMounted(() => fetchSpaces())
+
+const tabs = [
+    { key: 'all',       label: 'All' },
+    { key: 'draft',     label: 'Pending' },
+    { key: 'published', label: 'Live' },
+    { key: 'paused',    label: 'Paused' },
+]
 </script>
 
 <template>
-    <!-- Nav ──────────────────────────────────────────────────────────────── -->
-    <nav class="navbar navbar-light bg-white border-bottom px-4" style="min-height: 57px;">
-        <RouterLink to="/admin" class="navbar-brand fw-bold" style="letter-spacing: -.3px; color: #1B4332;">
-            CoworkPlatform — Admin
-        </RouterLink>
-        <div class="d-flex gap-2 align-items-center">
-            <RouterLink
-                to="/admin/spaces"
-                class="btn btn-sm"
-                style="background: #2D6A4F; color: #fff; border: none; font-size: 13px;"
-            >
-                Spaces
-            </RouterLink>
-            <span class="text-muted d-none d-md-inline" style="font-size: 13px;">{{ auth.user?.name }}</span>
-            <RouterLink to="/" class="btn btn-sm btn-outline-secondary">Home</RouterLink>
-            <button class="btn btn-sm btn-outline-secondary" @click="handleLogout">Logout</button>
-        </div>
-    </nav>
+    <div class="d-flex align-items-stretch bg-linen" style="min-height: 100vh;">
+        <AdminSidebar />
 
-    <!-- Page ─────────────────────────────────────────────────────────────── -->
-    <div style="background: #F7F4EF; min-height: calc(100vh - 57px);">
-        <div class="container py-5">
+        <main class="flex-grow-1 px-4 px-lg-5 py-5" style="min-width: 0;">
 
             <!-- Header -->
-            <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+            <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
                 <div>
-                    <h1 class="h4 fw-bold mb-1" style="color: #1B4332;">Space Approvals</h1>
-                    <p class="text-muted mb-0" style="font-size: 13px;">
-                        Review and publish or pause submitted spaces
-                    </p>
+                    <h1 class="headline-lg mb-1" style="color: #1A1A18;">Space Approvals</h1>
+                    <p class="mb-0" style="font-size: 14px; color: #6B6660;">Review and publish or pause submitted spaces.</p>
                 </div>
-                <span
-                    v-if="counts.draft > 0"
-                    class="badge rounded-pill align-self-center"
-                    style="background: #fef3c7; color: #92400e; font-size: 12px; padding: .4em .85em;"
-                >
-                    {{ counts.draft }} pending review
-                </span>
+                <span v-if="counts.draft > 0" class="lf-badge lf-badge--pending align-self-center"><span class="dot"></span>{{ counts.draft }} pending review</span>
             </div>
 
             <!-- Error banner -->
-            <div
-                v-if="actionError"
-                class="alert d-flex justify-content-between align-items-center mb-4 py-2 px-3"
-                style="background: #fee2e2; color: #991b1b; border: none; border-radius: .75rem; font-size: 13px;"
-            >
+            <div v-if="actionError" class="d-flex justify-content-between align-items-center mb-4 px-3 py-2" style="background: rgba(192,57,43,.08); color: #7B1A12; border: 1px solid rgba(192,57,43,.2); border-radius: 10px; font-size: 13px;">
                 {{ actionError }}
-                <button
-                    type="button"
-                    class="btn-close btn-close-sm ms-3 flex-shrink-0"
-                    style="filter: invert(20%) sepia(80%) saturate(600%) hue-rotate(320deg);"
-                    @click="actionError = null"
-                ></button>
+                <button type="button" class="btn-ghost p-0" style="color: #7B1A12;" @click="actionError = null" aria-label="Dismiss">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
 
-            <!-- Filter tabs -->
-            <div class="d-flex gap-1 mb-4 flex-wrap">
-                <button
-                    v-for="tab in [
-                        { key: 'all',       label: 'All' },
-                        { key: 'draft',     label: 'Pending' },
-                        { key: 'published', label: 'Live' },
-                        { key: 'paused',    label: 'Paused' },
-                    ]"
-                    :key="tab.key"
-                    class="btn btn-sm d-flex align-items-center gap-2"
-                    :style="filter === tab.key
-                        ? 'background: #1B4332; color: #fff; border: none;'
-                        : 'background: #fff; color: #495057; border: 1px solid #dee2e6;'"
-                    @click="filter = tab.key"
-                >
+            <!-- Filter pills -->
+            <div class="lf-seg d-inline-flex mb-4">
+                <button v-for="tab in tabs" :key="tab.key" class="lf-seg__btn d-inline-flex align-items-center gap-2" :class="{ active: filter === tab.key }" @click="filter = tab.key">
                     {{ tab.label }}
-                    <span
-                        class="badge rounded-pill"
-                        :style="filter === tab.key
-                            ? 'background: rgba(255,255,255,.25); color: #fff;'
-                            : 'background: #e9ecef; color: #495057;'"
-                        style="font-size: 10px; min-width: 20px;"
-                    >
-                        {{ counts[tab.key] }}
-                    </span>
+                    <span v-if="counts[tab.key]" class="lf-seg__count">{{ counts[tab.key] }}</span>
                 </button>
             </div>
 
             <!-- Loading skeleton -->
-            <div v-if="loading" class="card border-0 shadow-sm overflow-hidden" style="border-radius: .75rem;">
-                <div
-                    v-for="n in 6"
-                    :key="n"
-                    class="d-flex align-items-center gap-3 px-4 py-3"
-                    :class="n < 6 ? 'border-bottom' : ''"
-                    style="background: #fff;"
-                >
-                    <div class="sk" style="width: 32px; height: 32px; border-radius: .5rem; flex-shrink: 0;"></div>
+            <div v-if="loading" class="lf-card overflow-hidden">
+                <div v-for="n in 6" :key="n" class="d-flex align-items-center gap-3 px-4 py-3" :style="n < 6 ? 'border-bottom: 1px solid #E4DFD7;' : ''">
+                    <div class="sk" style="width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;"></div>
                     <div class="sk" style="height: 14px; width: 24%;"></div>
                     <div class="sk" style="height: 14px; width: 13%;"></div>
-                    <div class="sk" style="height: 14px; width: 11%;"></div>
-                    <div class="sk ms-auto" style="height: 22px; width: 72px; border-radius: 20px;"></div>
-                    <div class="d-flex gap-1">
-                        <div class="sk" style="height: 28px; width: 66px; border-radius: 6px;"></div>
-                        <div class="sk" style="height: 28px; width: 58px; border-radius: 6px;"></div>
-                    </div>
+                    <div class="sk ms-auto" style="height: 22px; width: 90px; border-radius: 12px;"></div>
+                    <div class="sk" style="height: 28px; width: 150px; border-radius: 8px;"></div>
                 </div>
             </div>
 
             <!-- Table -->
-            <div v-else-if="filtered.length" class="card border-0 shadow-sm overflow-hidden" style="border-radius: .75rem;">
+            <div v-else-if="filtered.length" class="lf-card overflow-hidden">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead style="background: #F7F4EF;">
+                    <table class="lf-table">
+                        <thead>
                             <tr>
-                                <th
-                                    v-for="col in ['Space', 'Host', 'City', 'Status', '']"
-                                    :key="col"
-                                    class="py-3 border-bottom fw-semibold"
-                                    :class="col === 'Space' ? 'px-4' : (col === '' ? 'pe-4 text-end' : '')"
-                                    style="font-size: 11px; color: #6c757d; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap;"
-                                >
-                                    {{ col }}
-                                </th>
+                                <th style="padding-left: 24px;">Space</th>
+                                <th>Host</th>
+                                <th>City</th>
+                                <th>Status</th>
+                                <th class="text-end" style="padding-right: 24px;"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="space in filtered" :key="space.id" style="background: #fff;">
-                                <!-- Title + slug -->
-                                <td class="px-4 py-3" style="min-width: 200px;">
-                                    <div class="fw-semibold mb-1" style="font-size: 14px; color: #1a1a2e;">
-                                        {{ space.title }}
-                                    </div>
-                                    <div class="font-monospace" style="font-size: 10px; color: #adb5bd;">
-                                        {{ space.slug }}
-                                    </div>
+                            <tr v-for="space in filtered" :key="space.id">
+                                <td style="padding-left: 24px; min-width: 220px;">
+                                    <div class="fw-semibold mb-1" style="font-size: 14px; color: #1A1A18;">{{ space.title }}</div>
+                                    <div class="mono-ref" style="color: #A09890;">{{ space.slug }}</div>
                                 </td>
-                                <!-- Host -->
-                                <td class="py-3" style="font-size: 13px; color: #495057; white-space: nowrap;">
-                                    {{ space.host?.name ?? '—' }}
+                                <td style="white-space: nowrap; color: #4A4740;">{{ space.host?.name ?? '—' }}</td>
+                                <td style="white-space: nowrap; color: #4A4740;">{{ space.city ?? '—' }}<span v-if="space.country" style="color: #A09890;">, {{ space.country }}</span></td>
+                                <td>
+                                    <span class="lf-badge" :class="STATUS_BADGE[space.status]"><span class="dot"></span>{{ STATUS_LABEL[space.status] ?? space.status }}</span>
                                 </td>
-                                <!-- City -->
-                                <td class="py-3" style="font-size: 13px; color: #495057; white-space: nowrap;">
-                                    {{ space.city ?? '—' }}<span v-if="space.country" class="text-muted">, {{ space.country }}</span>
-                                </td>
-                                <!-- Status badge -->
-                                <td class="py-3">
-                                    <span
-                                        class="badge rounded-pill"
-                                        :style="STATUS_STYLE[space.status]"
-                                        style="font-size: 11px; font-weight: 500; padding: .4em .85em;"
-                                    >
-                                        {{ STATUS_LABEL[space.status] ?? space.status }}
-                                    </span>
-                                </td>
-                                <!-- Actions -->
-                                <td class="py-3 pe-4 text-end" style="white-space: nowrap;">
+                                <td class="text-end" style="padding-right: 24px; white-space: nowrap;">
                                     <div class="d-flex gap-2 justify-content-end">
-                                        <button
-                                            v-if="space.status !== 'published'"
-                                            class="btn btn-sm"
-                                            style="background: #2D6A4F; color: #fff; border: none; font-size: 12px; border-radius: .5rem;"
-                                            @click="approve(space)"
-                                        >
+                                        <button v-if="space.status !== 'published'" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1" @click="approve(space)">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                             Approve
                                         </button>
-                                        <button
-                                            v-if="space.status !== 'paused'"
-                                            class="btn btn-sm"
-                                            style="background: #fff; color: #991b1b; border: 1px solid #fca5a5; font-size: 12px; border-radius: .5rem;"
-                                            @click="reject(space)"
-                                        >
+                                        <button v-if="space.status !== 'paused'" class="btn btn-sm btn-outline-secondary" style="--bs-btn-color: #C0392B; --bs-btn-hover-color: #C0392B; --bs-btn-hover-border-color: #C0392B;" @click="reject(space)">
                                             {{ space.status === 'published' ? 'Unpublish' : 'Reject' }}
                                         </button>
                                     </div>
@@ -266,19 +164,10 @@ onMounted(() => fetchSpaces())
                 </div>
 
                 <!-- Pagination -->
-                <div
-                    v-if="meta.last_page > 1"
-                    class="d-flex justify-content-center py-3 border-top"
-                    style="background: #F7F4EF;"
-                >
+                <div v-if="meta.last_page > 1" class="d-flex justify-content-center py-3" style="border-top: 1px solid #E4DFD7; background: #FAFAF8;">
                     <nav>
                         <ul class="pagination pagination-sm mb-0">
-                            <li
-                                v-for="page in meta.last_page"
-                                :key="page"
-                                class="page-item"
-                                :class="{ active: page === meta.current_page }"
-                            >
+                            <li v-for="page in meta.last_page" :key="page" class="page-item" :class="{ active: page === meta.current_page }">
                                 <button class="page-link" @click="fetchSpaces(page)">{{ page }}</button>
                             </li>
                         </ul>
@@ -287,23 +176,11 @@ onMounted(() => fetchSpaces())
             </div>
 
             <!-- Empty state -->
-            <div
-                v-else
-                class="text-center py-5 d-flex flex-column align-items-center justify-content-center"
-                style="min-height: 300px;"
-            >
-                <div
-                    class="d-flex align-items-center justify-content-center rounded-circle mb-4"
-                    style="width: 80px; height: 80px; background: #EEEAE3;"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#707973" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                        <rect x="9" y="3" width="6" height="4" rx="1" ry="1"/>
-                        <line x1="9" y1="12" x2="15" y2="12"/>
-                        <line x1="9" y1="16" x2="11" y2="16"/>
-                    </svg>
+            <div v-else class="text-center py-5 d-flex flex-column align-items-center justify-content-center" style="min-height: 320px;">
+                <div class="d-flex align-items-center justify-content-center rounded-circle mb-4" style="width: 88px; height: 88px; background: #fff; border: 1px solid #E4DFD7;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#A09890" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="11" y2="16"/></svg>
                 </div>
-                <h2 class="fw-semibold mb-2" style="font-size: 18px; color: #1A1A18;">
+                <h2 class="headline-sm mb-2" style="color: #1A1A18;">
                     {{
                         filter === 'all'       ? 'No spaces submitted yet'  :
                         filter === 'draft'     ? 'No spaces pending review' :
@@ -311,11 +188,27 @@ onMounted(() => fetchSpaces())
                                                  'No spaces are paused'
                     }}
                 </h2>
-                <p style="font-size: 13px; color: #6B6660; max-width: 300px;">
+                <p style="font-size: 14px; color: #6B6660; max-width: 320px;">
                     {{ filter === 'draft' ? "Hosts haven't submitted any spaces for approval yet." : 'Try switching the filter above.' }}
                 </p>
             </div>
 
-        </div>
+        </main>
     </div>
 </template>
+
+<style scoped>
+.lf-seg { background: #EEEAE3; border: 1px solid #E4DFD7; border-radius: 9999px; padding: 4px; }
+.lf-seg__btn {
+    border: none; background: transparent; color: #6B6660;
+    font-size: 13px; font-weight: 600; padding: 6px 16px; border-radius: 9999px;
+    cursor: pointer; transition: background .15s, color .15s;
+}
+.lf-seg__btn.active { background: #2D6A4F; color: #fff; }
+.lf-seg__count {
+    font-size: 10px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.08); color: inherit;
+}
+.lf-seg__btn.active .lf-seg__count { background: rgba(255,255,255,.25); }
+</style>

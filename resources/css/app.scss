@@ -1,38 +1,301 @@
-// Override Bootstrap variables
-$enable-negative-margins: true;
-$spacer:                1rem;
-$primary:               #1a1a2e;
-$secondary:             #4a4a6a;
-$font-family-sans-serif: 'Inter', sans-serif;
-$border-radius:          0.75rem;
-$border-radius-lg:       1rem;
-$border-radius-xl:       1.25rem;
-$card-border-width:      0;
-$card-box-shadow:        0 2px 16px rgba(0,0,0,.08);
+/* ============================================================================
+   CoworkPlatform — Linen & Forest design system
+   Bootstrap 5 (Sass) + design tokens. This file is the single source of the
+   visual language; component templates lean on the helper classes below.
+   ============================================================================ */
 
-// Import Bootstrap
+/* ── Fonts ─────────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+/* ── Linen & Forest palette (Sass vars, reused below) ──────────────────── */
+$lf-linen:          #F7F4EF;
+$lf-linen-dim:      #EEEAE3;
+$lf-linen-elev:     #E4DFD7;
+$lf-white:          #FFFFFF;
+$lf-card-hover:     #FAFAF8;
+
+$lf-forest:         #2D6A4F;
+$lf-forest-deep:    #1B4332;
+$lf-forest-darkest: #143D29;
+$lf-forest-bg:      #D4EDE3;
+
+$lf-amber:          #D4930A;
+$lf-amber-hover:    #B57D08;
+
+$lf-text:           #1A1A18;
+$lf-text-2:         #6B6660;
+$lf-text-3:         #A09890;
+
+$lf-border:         #D4CEC6;
+$lf-border-subtle:  #E4DFD7;
+$lf-border-strong:  #B8B2A8;
+
+$lf-error:          #C0392B;
+$lf-bark:           #5C5347;
+$lf-sage:           #52796F;
+$lf-info:           #1A6B8A;
+
+/* ── Bootstrap variable overrides ──────────────────────────────────────── */
+$enable-negative-margins: true;
+
+$primary:   $lf-forest;
+$secondary: $lf-bark;
+$success:   $lf-forest;
+$danger:    $lf-error;
+$warning:   $lf-amber;
+$info:      $lf-info;
+$light:     $lf-linen-dim;
+$dark:      $lf-text;
+
+$body-bg:    $lf-linen;
+$body-color: $lf-text;
+
+$font-family-sans-serif: 'Inter', system-ui, -apple-system, sans-serif;
+$font-family-monospace:  'DM Mono', ui-monospace, monospace;
+$font-size-base:         0.9375rem;   // 15px
+$body-secondary-color:   $lf-text-2;
+
+$border-color:        $lf-border-subtle;
+$border-radius:       0.625rem;
+$border-radius-sm:    0.375rem;
+$border-radius-lg:    0.875rem;
+$border-radius-xl:    1.125rem;
+$border-radius-pill:  9999px;
+
+$card-bg:             $lf-white;
+$card-border-color:   $lf-border-subtle;
+$card-border-radius:  1.125rem;
+$card-box-shadow:     0 1px 3px rgba(26,26,24,.06), 0 4px 12px rgba(26,26,24,.04);
+
+$input-bg:            $lf-white;
+$input-border-color:  $lf-border;
+$input-border-radius: 0.625rem;
+$input-focus-border-color: $lf-forest;
+$input-focus-box-shadow:   0 0 0 0.2rem rgba(45,106,79,.18);
+$input-placeholder-color:  $lf-text-3;
+
+$btn-border-radius:    0.625rem;
+$btn-border-radius-sm: 0.5rem;
+$btn-border-radius-lg: 0.75rem;
+$btn-font-weight:      600;
+$btn-focus-box-shadow: 0 0 0 0.2rem rgba(45,106,79,.18);
+
+$link-color:           $lf-forest;
+$link-hover-color:     $lf-forest-deep;
+$link-decoration:      none;
+
+$badge-font-weight:    600;
+$badge-border-radius:  0.375rem;
+
+$nav-link-color:           $lf-text-2;
+$nav-link-hover-color:     $lf-text;
+$pagination-color:         $lf-text-2;
+$pagination-active-bg:     $lf-forest;
+$pagination-active-border-color: $lf-forest;
+$pagination-border-color:  $lf-border-subtle;
+$pagination-border-radius: 0.5rem;
+
+/* ── Bootstrap ─────────────────────────────────────────────────────────── */
 @import 'bootstrap/scss/bootstrap';
 
-// Global base styles
+/* ============================================================================
+   Design-system layer — helper classes used across components
+   ============================================================================ */
+
 body {
     font-family: $font-family-sans-serif;
-    background-color: #f8f9fa;
-    color: #1a1a2e;
+    background-color: $lf-linen;
+    color: $lf-text;
+    -webkit-font-smoothing: antialiased;
 }
 
-a {
-    text-decoration: none;
-    color: inherit;
+a { text-decoration: none; color: inherit; }
+
+::selection { background: rgba(45,106,79,.18); }
+
+/* ── Type helpers ──────────────────────────────────────────────────────── */
+.font-display { font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: -0.02em; }
+.font-mono    { font-family: 'DM Mono', monospace; }
+
+.display-hero {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: clamp(44px, 6vw, 80px); line-height: 1.05; letter-spacing: -0.03em;
+}
+.headline-lg { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 36px; line-height: 1.2; letter-spacing: -0.02em; }
+.headline-md { font-weight: 600; font-size: 24px; line-height: 1.35; letter-spacing: -0.015em; }
+.headline-sm { font-weight: 600; font-size: 18px; line-height: 1.4; letter-spacing: -0.01em; }
+.body-lg     { font-size: 17px; line-height: 1.75; }
+.label-caps  { font-size: 11px; font-weight: 600; line-height: 1; letter-spacing: 0.09em; text-transform: uppercase; }
+
+.mono-price  { font-family: 'DM Mono', monospace; font-weight: 500; }
+.mono-sm     { font-family: 'DM Mono', monospace; font-size: 12px; }
+.mono-ref    { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.04em; }
+
+.text-secondary-lf { color: $lf-text-2 !important; }
+.text-tertiary-lf  { color: $lf-text-3 !important; }
+.text-forest       { color: $lf-forest !important; }
+.text-forest-deep  { color: $lf-forest-deep !important; }
+.text-amber        { color: $lf-amber !important; }
+
+/* ── Surfaces ──────────────────────────────────────────────────────────── */
+.bg-linen      { background-color: $lf-linen !important; }
+.bg-linen-dim  { background-color: $lf-linen-dim !important; }
+.bg-linen-elev { background-color: $lf-linen-elev !important; }
+.border-subtle { border-color: $lf-border-subtle !important; }
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+.btn { font-weight: 600; transition: background-color .12s ease, border-color .12s ease, transform .08s ease, color .12s ease; }
+
+.btn-primary {
+    --bs-btn-bg: #{$lf-forest};
+    --bs-btn-border-color: #{$lf-forest};
+    --bs-btn-hover-bg: #{$lf-forest-deep};
+    --bs-btn-hover-border-color: #{$lf-forest-deep};
+    --bs-btn-active-bg: #{$lf-forest-darkest};
+    --bs-btn-active-border-color: #{$lf-forest-darkest};
+    --bs-btn-disabled-bg: #{$lf-border};
+    --bs-btn-disabled-border-color: #{$lf-border};
+    --bs-btn-disabled-color: #{$lf-text-3};
+    color: #fff;
+}
+.btn-primary:active { transform: scale(.98); }
+
+.btn-outline-primary {
+    --bs-btn-color: #{$lf-forest};
+    --bs-btn-border-color: #{$lf-forest};
+    --bs-btn-hover-bg: rgba(45,106,79,.06);
+    --bs-btn-hover-color: #{$lf-forest-deep};
+    --bs-btn-hover-border-color: #{$lf-forest-deep};
+    border-width: 1.5px;
 }
 
-// Skeleton shimmer
+.btn-outline-secondary {
+    --bs-btn-color: #{$lf-text-2};
+    --bs-btn-border-color: #{$lf-border};
+    --bs-btn-hover-bg: #{$lf-white};
+    --bs-btn-hover-color: #{$lf-text};
+    --bs-btn-hover-border-color: #{$lf-border-strong};
+    --bs-btn-active-bg: #{$lf-linen};
+    --bs-btn-active-color: #{$lf-text};
+    --bs-btn-active-border-color: #{$lf-border-strong};
+}
+
+.btn-ghost { color: $lf-text-2; border: none; background: transparent; }
+.btn-ghost:hover { color: $lf-text; }
+
+/* ── Inputs ────────────────────────────────────────────────────────────── */
+.form-control, .form-select {
+    border-color: $lf-border;
+    color: $lf-text;
+    background-color: $lf-white;
+}
+.form-control::placeholder { color: $lf-text-3; }
+.form-control:focus, .form-select:focus {
+    border-color: $lf-forest;
+    box-shadow: 0 0 0 3px rgba(45,106,79,.18);
+}
+.form-label { font-size: 13px; font-weight: 500; color: #4A4740; margin-bottom: 6px; }
+.form-check-input:checked { background-color: $lf-forest; border-color: $lf-forest; }
+.form-check-input:focus { border-color: $lf-forest; box-shadow: 0 0 0 .2rem rgba(45,106,79,.18); }
+
+/* ── Cards ─────────────────────────────────────────────────────────────── */
+.card { border: 1px solid $lf-border-subtle; background: $lf-white; }
+.lf-card {
+    background: $lf-white;
+    border: 1px solid $lf-border-subtle;
+    border-radius: 1.125rem;
+    box-shadow: 0 1px 3px rgba(26,26,24,.06), 0 4px 12px rgba(26,26,24,.04);
+}
+
+/* ── Status badges ─────────────────────────────────────────────────────── */
+.lf-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600; line-height: 1;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 4px 9px; border-radius: 6px; border: 1px solid transparent;
+}
+.lf-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.lf-badge--available { background: rgba(45,106,79,.10);  color: #1B4332; border-color: rgba(45,106,79,.25); }
+.lf-badge--pending   { background: rgba(212,147,10,.10); color: #7A5000; border-color: rgba(212,147,10,.25); }
+.lf-badge--confirmed { background: rgba(26,107,138,.10); color: #0D4F68; border-color: rgba(26,107,138,.25); }
+.lf-badge--cancelled { background: rgba(192,57,43,.10);  color: #7B1A12; border-color: rgba(192,57,43,.25); }
+.lf-badge--completed { background: rgba(82,121,111,.10); color: #2F524A; border-color: rgba(82,121,111,.25); }
+
+/* ── Amenity chip ──────────────────────────────────────────────────────── */
+.lf-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: $lf-linen; border: 1px solid $lf-border;
+    border-radius: 6px; padding: 4px 10px;
+    font-size: 12px; color: $lf-bark;
+}
+
+/* ── Glass navigation ──────────────────────────────────────────────────── */
+.lf-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(247,244,239,.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid $lf-border-subtle;
+}
+.lf-logo-mark {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: $lf-forest; color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; flex-shrink: 0;
+}
+.lf-navlink {
+    color: $lf-text-2; font-size: 14px; font-weight: 500;
+    padding: 6px 2px; position: relative; transition: color .12s ease;
+}
+.lf-navlink:hover { color: $lf-text; }
+.lf-navlink.router-link-active { color: $lf-forest; }
+
+/* ── Host / Admin sidebar ──────────────────────────────────────────────── */
+.lf-sidebar { width: 248px; background: $lf-linen-dim; border-right: 1px solid $lf-border; }
+.lf-sidebar__label { font-size: 10px; font-weight: 600; color: $lf-text-3; text-transform: uppercase; letter-spacing: 0.1em; }
+.lf-sidebar__item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px; font-weight: 500; color: $lf-text-2;
+    padding: 9px 14px; border-radius: 8px; border-left: 3px solid transparent;
+    transition: background .12s ease, color .12s ease;
+}
+.lf-sidebar__item:hover { background: rgba(45,106,79,.06); color: $lf-text; }
+.lf-sidebar__item.router-link-active {
+    background: $lf-forest-bg; color: $lf-forest-deep;
+    font-weight: 600; border-left-color: $lf-forest;
+}
+
+/* ── Price breakdown block ─────────────────────────────────────────────── */
+.lf-breakdown { background: $lf-linen; border: 1px solid $lf-border-subtle; border-radius: 12px; padding: 16px 20px; }
+.lf-breakdown__row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
+.lf-breakdown__row .label { font-size: 14px; color: $lf-text-2; }
+.lf-breakdown__row .value { font-family: 'DM Mono', monospace; font-size: 14px; color: $lf-text; }
+.lf-breakdown__total { border-top: 1px solid $lf-border; margin-top: 6px; padding-top: 12px; }
+.lf-breakdown__total .label { font-size: 15px; font-weight: 600; color: $lf-text; }
+.lf-breakdown__total .value { font-family: 'DM Mono', monospace; font-weight: 600; font-size: 18px; color: $lf-forest; }
+
+/* ── Tables (admin / host) ─────────────────────────────────────────────── */
+.lf-table { width: 100%; background: $lf-white; border-collapse: collapse; }
+.lf-table thead th {
+    background: $lf-linen-dim; color: $lf-text-2;
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 12px 16px; border-bottom: 1px solid $lf-border; text-align: left;
+}
+.lf-table tbody td { padding: 14px 16px; border-bottom: .5px solid $lf-border-subtle; font-size: 14px; vertical-align: middle; }
+.lf-table tbody tr:nth-child(odd) { background: $lf-card-hover; }
+.lf-table tbody tr:hover { background: rgba(45,106,79,.04); }
+.lf-table .num { font-family: 'DM Mono', monospace; }
+
+/* ── Section divider ───────────────────────────────────────────────────── */
+.lf-divider { height: 1px; background: $lf-border-subtle; border: 0; }
+
+/* ── Skeleton shimmer ──────────────────────────────────────────────────── */
 .sk {
     background-image: linear-gradient(90deg, #EEEAE3 0%, #E4DFD7 50%, #EEEAE3 100%);
     background-size: 200% 100%;
     animation: sk-shimmer 2s linear infinite;
     border-radius: 4px;
 }
-
 @keyframes sk-shimmer {
     0%   { background-position: 200% 0; }
     100% { background-position: -200% 0; }
